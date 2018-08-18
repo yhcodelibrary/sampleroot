@@ -1,0 +1,35 @@
+<!--?xml version="1.0" encoding="UTF-8" ?-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="sample.web.taskweb.dao.DaoEvent">
+	<select id="selectBetweenEventDate"
+		resultType="sample.web.taskweb.model.ModelEvent">
+		SELECT eventId, type, category,detail,note,eventDate ,ssVersion 
+		FROM T_SMP_Event 
+		WHERE eventDate BETWEEN #{from,jdbcType=DATE} AND #{to,jdbcType=DATE}
+		AND ssIsDelete = 0
+	</select>
+	<insert id="createEvent">
+		INSERT INTO T_SMP_Event
+		( userId , type , category ,amount
+		, detail , note , eventDate
+		, ssCreateDate , ssCreatePrg , ssUpdateDate , ssUpdatePrg , ssVersion )
+		VALUES ( #{userId} , #{type} , #{category} , #{amount}
+		, #{detail} , #{note} , cast('2018-04-03' as date)
+		, #{ssCreateDate} , #{ssCreatePrg} , #{ssUpdateDate} , #{ssUpdatePrg} , #{ssVersion} );
+	<selectKey resultType="int" keyProperty="eventId"
+		order="AFTER">
+		select @@IDENTITY
+	</selectKey>
+	</insert>
+	<update id="updateEvent">
+		UPDATE T_SMP_Event SET type = #{type} , category = #{category} 
+		, amount = #{amount} , detail = #{detail}  
+		, note = #{note} , eventDate = #{eventDate,jdbcType=DATE} 
+		, ssUpdateDate = #{ssUpdateDate} 
+		, ssUpdatePrg = #{ssUpdatePrg}  
+		, ssVersion = ssVersion + 1 
+		WHERE userId =#{userId}  AND eventId =#{eventId}   
+		AND ssVersion = #{ssVersion}  
+		AND ssIsDelete ='0' ;
+	</update>
+</mapper>
