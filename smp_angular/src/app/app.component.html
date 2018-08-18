@@ -1,0 +1,32 @@
+<div>
+  <div id="mback" class="opacity3">
+    <header class="bg-light">
+        <div class="navbar navbar-expand-lg navbar-light navbar-fixed-top">
+            <div class="container">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#Navber" aria-controls="Navber" aria-expanded="false" aria-label="ナビゲーションの切替">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="Navber">
+                        <ul class="navbar-nav mr-auto">
+                            <li class="nav-item">
+                                <a routerLink="/calendar" routerLinkActive="active" class="nav-link"><span class="h-jp">カレンダー</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a routerLink="/list" routerLinkActive="active" class="nav-link"><span class="h-jp">一覧</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a routerLink="/graph" routerLinkActive="active" class="nav-link"><span class="h-jp">グラフ</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="h-spc"></div>
+        <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

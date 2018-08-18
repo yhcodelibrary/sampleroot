@@ -1,0 +1,66 @@
+
+<div class="container bg-info"
+    [class.bg-info]="this.editInfo.editMode === 1"
+    [class.bg-success]="this.editInfo.editMode !== 1">
+  <div class="modal-header text-white">
+    <h4 class="modal-title">{{editInfo.getEditName()}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="card text-danger" *ngIf="valid.errorMessages.length != 0">
+        <ul>
+            <li *ngFor="let err of valid.errorMessages">
+                {{err}}
+            </li>
+        </ul>
+    </div>
+    <div class="card">
+        <div class="card-body" style="width:100%;padding: 20px;">
+            <div id="datepicker" class="form-group is-valid">
+                <label class="control-label">発生日</label>
+                <input type="text" id="eventDate" 
+                    class="form-control date" 
+                    [class.is-invalid]="isValidError('eventDate')"
+                    [(ngModel)]="editTarget.eventDateString"
+                    #datePicker (click)="editTarget.eventDateString = datePicker.value">
+            </div>
+            <div class="form-group">
+                <label class="control-label">種別１</label>
+                <select class="form-control" 
+                    [class.is-invalid]="isValidError('type')"
+                    [(ngModel)]="editTarget.type"
+                    (ngModelChange)="onChangeType()" required>
+                    <option *ngFor="let key of getKeys(types)" [value]="key">{{types.get(key)}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="control-label">種別２</label>
+                <select class="form-control" 
+                    [class.is-invalid]="isValidError('category')"
+                    [(ngModel)]="editTarget.category" required>
+                    <option *ngFor="let key of getKeys(categories)" [value]="key">{{categories.get(key)}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="control-label">詳細</label>
+                <input class="form-control" type="text"  
+                    [class.is-invalid]="isValidError('detail')"
+                    [(ngModel)]="editTarget.detail">
+            </div>
+            <div class="form-group">
+                <label class="control-label">備考</label>
+                <textarea class="form-control"
+                    [class.is-invalid]="isValidError('detail')"
+                    [(ngModel)]="editTarget.note">
+                </textarea>
+            </div>
+        </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="onClickRegister()">反映</button>
+    <button type="button" class="btn btn-secondary" (click)="onClickCancel()">キャンセル</button>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+/* You can add global styles to this file, and also import other style files */
+
+
+.col-xs-1-7, .col-sm-1-7, .col-md-1-7, .col-lg-1-7 {
+    position: relative;
+    min-height: 1px;
+    padding-right: 2px;
+    padding-left: 2px;
+}   
+.col-xs-1-7 {
+    width: 14%;
+    float: left;
+}
+
+.fade.show {
+    opacity: 1;
+}
+
+ngb-modal-window.modal.fade.show {
+  opacity: 1;
+}

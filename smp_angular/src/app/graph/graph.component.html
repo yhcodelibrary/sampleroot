@@ -1,0 +1,28 @@
+<!-- https://valor-software.com/ng2-charts/ -->
+<div class="container">
+  <div class="row">
+    <div class="col-3">
+      <div class=”form-group”>
+        <label>グラフ種別</label>
+        <select class="form-control">
+          <option value="1">棒グラフ</option>
+          <option value="2">円グラフ</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <div style="display: block">
+        <canvas baseChart
+                [datasets]="barChartData"
+                [labels]="barChartLabels"
+                [options]="barChartOptions"
+                [legend]="barChartLegend"
+                [chartType]="barChartType"
+                (chartHover)="chartHovered($event)"
+                (chartClick)="chartClicked($event)"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
