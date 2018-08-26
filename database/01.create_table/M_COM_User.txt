@@ -1,0 +1,15 @@
+
+use sampledb;
+CREATE TABLE M_SMP_User (
+    userId int NOT NULL,
+    userName VARCHAR (20) NOT NULL,
+    password VARCHAR (20) NOT NULL,
+    ssCreateDate datetime,
+    ssCreatePrg VARCHAR (100),
+    ssUpdateDate datetime,
+    ssUpdatePrg VARCHAR (100),
+    ssVersion int,
+    ssIsDelete int,
+    
+    PRIMARY KEY (userId)
+)

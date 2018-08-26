@@ -1,6 +1,6 @@
 package sample.web.common.model;
 
-public class ModelProgram extends ModelSession {
+public class ModelProgram implements ModelSession {
 
 	private String programName;
 }

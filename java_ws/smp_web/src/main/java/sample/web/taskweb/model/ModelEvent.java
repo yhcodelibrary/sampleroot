@@ -15,7 +15,6 @@ import sample.web.common.model.ModelTableCommon;
 //@Setter
 public class ModelEvent 
 	extends ModelTableCommon 
-//	implements Serializable  
 {
 
 //    @Id

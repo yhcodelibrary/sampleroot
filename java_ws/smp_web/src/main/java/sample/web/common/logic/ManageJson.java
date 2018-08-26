@@ -1,4 +1,4 @@
-package sample.web.common.ilogic;
+package sample.web.common.logic;
 
 import java.io.IOException;
 

@@ -7,8 +7,6 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
-import sample.web.common.ilogic.ManageJson;
  
 @Component
 public class ManageJsonImpl implements ManageJson {

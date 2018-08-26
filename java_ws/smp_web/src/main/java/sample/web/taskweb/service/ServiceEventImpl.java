@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import sample.web.common.define.OptimisticLockException;
-import sample.web.common.ilogic.ManageUtil;
+import sample.web.common.logic.ManageUtil;
 import sample.web.taskweb.dao.DaoEvent;
 import sample.web.taskweb.model.ModelEvent;
 

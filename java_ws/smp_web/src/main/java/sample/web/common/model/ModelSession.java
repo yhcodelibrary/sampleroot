@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class ModelSession implements Serializable {
+public interface ModelSession {
 //	public ModelSession()
 //	{
 //		

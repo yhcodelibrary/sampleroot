@@ -1,6 +1,5 @@
 package sample.web.taskweb.controller;
 
-import java.io.Serializable;
 import java.util.Locale;
 
 import javax.servlet.http.HttpSession;
@@ -18,9 +17,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import sample.web.common.ilogic.ManageJson;
+import sample.web.common.define.CommonConst;
+import sample.web.common.logic.ManageJson;
 import sample.web.common.logic.ManageSession;
-import sample.web.common.model.ModelSessionValue;
+import sample.web.common.logic.ManageUtil;
 import sample.web.common.model.ModelValidErrors;
 import sample.web.taskweb.model.ModelEvent;
 import sample.web.taskweb.model.ModelJsonResult;
@@ -42,30 +42,33 @@ public class EventController {
 	ManageJson mngJson;
 
 	@Autowired
+	ManageUtil mngUtil;
+
+	@Autowired
 	ManageSession session;
 
 	@Autowired
 	ServiceEvent service;
 	
-	@RequestMapping("/get")
-	String get(HttpSession httpSession) throws Exception {
-
-		ModelSessionValue m = new ModelSessionValue();
-		m.setUserId((int)(Math.random() * 100));
-		session.<ModelSessionValue>setTemporary("key", m, ModelSessionValue.class);
-
-		return String.valueOf(m.getUserId());
-		// return "get world";
-	}
-
-	@RequestMapping("/get2")
-	String get2(HttpSession httpSession) throws Exception {
-
-		ModelSessionValue model = session.<ModelSessionValue>getTemporary("key", ModelSessionValue.class);
-
-		return String.valueOf(model.getUserId());
-		// return "get world";
-	}
+//	@RequestMapping("/get")
+//	String get(HttpSession httpSession) throws Exception {
+//
+//		ModelSessionValue m = new ModelSessionValue();
+//		m.setUserId((int)(Math.random() * 100));
+//		session.<ModelSessionValue>setTemporary("key", m, ModelSessionValue.class);
+//
+//		return String.valueOf(m.getUserId());
+//		// return "get world";
+//	}
+//
+//	@RequestMapping("/get2")
+//	String get2(HttpSession httpSession) throws Exception {
+//
+//		ModelSessionValue model = session.<ModelSessionValue>getTemporary("key", ModelSessionValue.class);
+//
+//		return String.valueOf(model.getUserId());
+//		// return "get world";
+//	}
 
 //	@RequestMapping("/get3")
 //	String get3(HttpSession httpSession) throws Exception {
@@ -85,8 +88,13 @@ public class EventController {
 		// return "get world";
 	}
 
-	// public String login(HttpSession httpSession, @RequestParam("userid") String
-	// userId) {
+	/**
+	 * 指定した月のイベントデータを検索する。
+	 * 前後10日ほどを含む
+	 * @param bean
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/getMonthEvents")
 	ResponseEntity<String> getMonthEvents(@RequestBody ModelRequestMonth bean) throws Exception {
 
@@ -105,44 +113,25 @@ public class EventController {
 		return response;
 		// return "get world";
 	}
-	
-	protected void getErrorResult(ModelJsonResult ret ,BindingResult result)
-	{
-		//バリデーションエラーインスタンスの作成
-		ModelValidErrors errors = new ModelValidErrors();
-		
-		ret.setStatus(2);
-		
-		//エラーメッセージ値を格納
-		for (FieldError err : result.getFieldErrors()) {
-			System.out.println(err);
-			String mes = messageSource.getMessage(err.getCode(), err.getArguments(), err.getDefaultMessage(),
-					Locale.getDefault());
-			System.out.println(mes);
-			errors.addErrorMessage(mes);
-			errors.addCode(err.getField());
-			// log.debug("error code = [" + err.getCode() + "]");
-		}
 
-		//戻り値を格納する
-		ret.setModelResult(errors);
-	}
 
+	/**
+	 * イベントデータの新規登録を行う。
+	 * 
+	 * @param target
+	 * @param result
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/createEvent")
 	ResponseEntity<String> createEvent(@RequestBody @Valid ModelEvent target, BindingResult result) throws Exception {
 
 		// 戻り値を作成
 		ModelJsonResult ret = new ModelJsonResult();
 
-		//アノテーションバリデーションエラーがある場合
-		if (result.hasErrors()) {
-			
-			//バリデーションエラーの結果を処理
-			this.getErrorResult(ret,result);
-		}
-		else
+		//バリデーションエラーがない場合に登録処理を行う
+		if(this.mngUtil.getErrorResult(ret, result)== true)
 		{
-			//登録処理を行う
 			this.service.createEvent(target);
 		}
 		
@@ -154,21 +143,24 @@ public class EventController {
 		return response;
 	}
 
+	
+	/**
+	 * イベントデータの更新を行う。
+	 * 
+	 * @param target
+	 * @param result
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/updateEvent")
 	ResponseEntity<String> updateEvent(@RequestBody @Valid ModelEvent target, BindingResult result) throws Exception {
 
 		// 戻り値を作成
 		ModelJsonResult ret = new ModelJsonResult();
 
-		//アノテーションバリデーションエラーがある場合
-		if (result.hasErrors()) {
-			
-			//バリデーションエラーの結果を処理
-			this.getErrorResult(ret,result);
-		}
-		else
+		//バリデーションエラーがない場合に更新処理を行う
+		if(this.mngUtil.getErrorResult(ret, result)== true)
 		{
-			//登録処理を行う
 			this.service.updateEvent(target);
 		}
 		

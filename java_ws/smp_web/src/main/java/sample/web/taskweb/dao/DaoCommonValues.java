@@ -11,5 +11,5 @@ import sample.web.taskweb.model.ModelCommonValues;
 public interface DaoCommonValues {
 
 	List<ModelCommonValues> selectTypeGroup(@Param("commonValueType") int commonValueType);
-	
+	 
 }

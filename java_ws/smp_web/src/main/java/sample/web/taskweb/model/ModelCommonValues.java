@@ -5,6 +5,7 @@ import sample.web.common.model.ModelTableCommon;
 public class ModelCommonValues
 	extends ModelTableCommon  {
 
+	
 	private int commonValueType;
 	private int keyValue;
 	private String valueText;

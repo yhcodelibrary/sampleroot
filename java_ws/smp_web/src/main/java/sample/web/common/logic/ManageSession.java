@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import sample.web.common.ilogic.ManageJson;
 import sample.web.common.model.ModelSession;
 
 
@@ -18,19 +17,27 @@ import sample.web.common.model.ModelSession;
 @Component
 public class ManageSession {
 
+	private static final String Temporary = "Temporary";
+	private static final String Never = "Never";
+	
 	@Autowired
 	ManageJson mngJson;
 
 	@Autowired
 	HttpSession session;  
 
+	/**
+	 * @param key
+	 * @param value
+	 * @param typeParameterClass
+	 */
 	public <T extends ModelSession>  void setTemporary(String key,T value,Class<T> typeParameterClass) {
 		String sessionkey = typeParameterClass.getName() + key;
-		this.<T>setCommon("Temporary",sessionkey,value);
+		this.<T>setCommon(Temporary,sessionkey,value);
 	}
 	public <T extends ModelSession>  void setNever(String key,T value,Class<T> typeParameterClass) {
 		String sessionkey = typeParameterClass.getName() + key;
-		this.<T>setCommon("Never",sessionkey,value);
+		this.<T>setCommon(Never,sessionkey,value);
 	}
 		
 	private <T extends ModelSession>  void setCommon(String area,String key,T value)
@@ -48,12 +55,12 @@ public class ManageSession {
 
 	public <T extends ModelSession> T getTemporary(String key,Class<T> typeParameterClass) throws JsonProcessingException {
 		String sessionkey = typeParameterClass.getName() + key;
-		return this.<T>getCommon("Temporary", sessionkey);
+		return this.<T>getCommon(Temporary, sessionkey);
 	}
 
 	public <T extends ModelSession> T getNever(String key,Class<T> typeParameterClass) throws JsonProcessingException {
 		String sessionkey = typeParameterClass.getName() + key;
-		return this.<T>getCommon("Never", sessionkey);
+		return this.<T>getCommon(Never, sessionkey);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -68,47 +75,41 @@ public class ManageSession {
 		return (T)hm.get(key);
 	}
 	
-//	public <T extends Object>  void SetTemporary(String key,Object value,Class<T> typeParameterClass) throws JsonProcessingException {
-//		
-//		ModelSession info = this.GetSession();
-//		
-//		ModelSessionValue m = new ModelSessionValue();
-//		m.SessionKey = typeParameterClass.getName() + key;
-//		m.JsonValue = mngJson.ConvertObjectToJson(m);
-//		
-//		info.getTemporary().put(m.SessionKey, m);
-//		info.IsUpdateTemprary = true;
-//	}
-	
-//	public <T extends Object>  T GetTemporary(String key,Class<T> typeParameterClass) throws JsonProcessingException {
-//		
-//		ModelSession info = this.GetSession();
-//		
-//		return null;
-//		/*
-//		String sessionKey = typeParameterClass.getName() + key;
-//		
-//		if(info.getTemporary().containsKey(sessionKey) == true) {
-//			return info.getTemporary().get(sessionKey)info;
-//		}
-//		else{
-//			return null;
-//		}
-//		
-//		m.JsonValue = mngJson.ConvertObjectToJson(m);
-//		
-//		info.Temporary.put(m.SessionKey, m);
-//		info.IsUpdateTemprary = true;
-//		*/
-//	}
-	
-	
-//	private ModelSession GetSession() {
-//		if(this.session != null) {
-//			return this.session;
-//		}
-//		
-//		return new ModelSession();
-//	}
+	public <T extends ModelSession> void removeTemporary(String key,Class<T> typeParameterClass)
+	{
+		String sessionkey = typeParameterClass.getName() + key;
+		this.<T>removeCommon(Temporary, sessionkey);
+	}
+	public <T extends ModelSession> void removeNever(String key,Class<T> typeParameterClass)
+	{
+		String sessionkey = typeParameterClass.getName() + key;
+		this.<T>removeCommon(Never, sessionkey);
+	}
+
+	private <T extends ModelSession> void removeCommon(String area,String key)
+	{
+		@SuppressWarnings("unchecked")
+		HashMap<String,ModelSession> hm = (HashMap<String,ModelSession>)this.session.getAttribute(area);
+
+		if(hm == null)
+		{
+			hm = new HashMap<String,ModelSession>();
+		}
+		if(hm.containsKey(key)) 
+		{
+			hm.remove(key);
+		}
+		
+		this.session.setAttribute(area, hm);
+	}
+
+	public void clearTemporary()
+	{
+		this.session.removeAttribute(Temporary);
+	}
+	public void clearNever()
+	{
+		this.session.removeAttribute(Never);	
+	}
 	
 }

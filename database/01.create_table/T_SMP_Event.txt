@@ -1,0 +1,20 @@
+
+use sampledb;
+CREATE TABLE T_SMP_Event (
+    eventId int NOT NULL AUTO_INCREMENT,
+    userId int NOT NULL,
+    type int,
+    category int,
+    amount int,
+    detail VARCHAR (200),
+    note VARCHAR (2000),
+    eventDate datetime,
+    ssCreateDate datetime,
+    ssCreatePrg VARCHAR (100),
+    ssUpdateDate datetime,
+    ssUpdatePrg VARCHAR (100),
+    ssVersion int,
+    ssIsDelete int,
+    
+    PRIMARY KEY (eventId)
+)

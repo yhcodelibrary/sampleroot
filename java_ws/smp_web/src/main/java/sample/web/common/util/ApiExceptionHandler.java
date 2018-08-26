@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import sample.web.common.define.CommonConst;
 import sample.web.common.define.OptimisticLockException;
-import sample.web.common.ilogic.ManageJson;
+import sample.web.common.define.UnLoginException;
+import sample.web.common.logic.ManageJson;
 import sample.web.common.model.ModelValidErrors;
 import sample.web.taskweb.model.ModelJsonResult;
 
@@ -23,16 +25,20 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	ManageJson mngJson;
 
 	private static final Logger LOG = LoggerFactory.getLogger(ApiExceptionHandler.class);
-
-	// 自分で定義したMyExceptionをキャッチする
-	//DB楽観ロックが発生した場合
+	
+	/**
+	 * DB楽観ロックが発生した場合
+	 * @param ex
+	 * @param request
+	 * @return
+	 */
 	@ExceptionHandler(OptimisticLockException.class)
-	public ResponseEntity<Object> handleMyException(OptimisticLockException ex, WebRequest request) {
-
-		System.out.println("handleMyException");
+	public ResponseEntity<Object> handleOptimisticLockException(OptimisticLockException ex, WebRequest request) {
+		
+		System.out.println("handleOptimisticLockException");
 		
 		ModelJsonResult result = new ModelJsonResult();
-		result.setStatus(2);
+		result.setStatus(CommonConst.AngularPostStatus.ValidationError);
 		ModelValidErrors err = new ModelValidErrors();
 		err.addErrorMessage("対象のデータは別のユーザーに更新されました。再検索を行ってください。");
 		result.setModelResult(err);
@@ -51,6 +57,36 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		}
 	}
 
+	/**
+	 * 未ログインアクセスが発生した場合
+	 * @param ex
+	 * @param request
+	 * @return
+	 */
+	@ExceptionHandler(UnLoginException.class)
+	public ResponseEntity<Object> handleUnLoginException(UnLoginException ex, WebRequest request) {
+		
+		System.out.println("handleUnLoginException");
+		
+		ModelJsonResult result = new ModelJsonResult();
+		result.setStatus(CommonConst.AngularPostStatus.UnLogin);
+		ModelValidErrors err = new ModelValidErrors();
+		err.addErrorMessage("ユーザーのログイン状態が確認できませんでした。");
+		result.setModelResult(err);
+		
+		HttpHeaders responseHeaders = new HttpHeaders();
+		try {
+			System.out.println(ex);
+			ResponseEntity<Object> response = new ResponseEntity<Object>(this.mngJson.ConvertObjectToJson(result),
+					responseHeaders, HttpStatus.OK);
+
+			return response;
+		} catch (Exception e) {
+
+			return super.handleExceptionInternal(ex, "handleAllException", null, HttpStatus.INTERNAL_SERVER_ERROR,
+					request);
+		}
+	}
 	// すべての例外をキャッチする
 	// どこにもキャッチされなかったらこれが呼ばれる
 	@ExceptionHandler(Exception.class)
@@ -58,7 +94,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
 		System.out.println("handleAllException");
 		ModelJsonResult result = new ModelJsonResult();
-		result.setStatus(99);
+		result.setStatus(CommonConst.AngularPostStatus.OccurException);
 
 		HttpHeaders responseHeaders = new HttpHeaders();
 		try {

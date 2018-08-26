@@ -2,7 +2,17 @@ package sample.web.common.model;
 
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import sample.web.common.define.CommonConst;
+import sample.web.common.logic.ManageSession;
+
 public class ModelTableCommon {
+
+	@Autowired
+	ManageSession session;
 	
 	public static final String ITEM_DEFINE = ",ssCreateDate,ssCreatePrg,ssUpdateDate,ssUpdatePrg,ssVersion";
 
@@ -51,7 +61,13 @@ public class ModelTableCommon {
 	public void setSsVersion(int ssVersion) {
 		this.ssVersion = ssVersion;
 	}
-	
+
+	public void setCreateInfo() throws JsonProcessingException
+	{
+		ModelActionInfo info = this.session.getNever(CommonConst.SystemSession.ActionInfo, ModelActionInfo.class);
+		
+		this.setCreateInfo(info.getActionName());
+	}
 	public void setCreateInfo(String prgName)
 	{
 		this.setSsCreateDate(new Date());
@@ -60,7 +76,13 @@ public class ModelTableCommon {
 		this.setSsUpdatePrg(prgName);
 		this.setSsVersion(1);
 	}
-	
+
+	public void setUpdateInfo() throws JsonProcessingException 
+	{
+		ModelActionInfo info = this.session.getNever(CommonConst.SystemSession.ActionInfo, ModelActionInfo.class);
+
+		this.setUpdateInfo(info.getActionName());
+	}
 	public void setUpdateInfo(String prgName) 
 	{
 		this.setUserId(1);

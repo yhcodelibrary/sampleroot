@@ -16,7 +16,7 @@ public interface DaoEvent {
 	
 	/**
 	 * Userテーブルへ新規登録
-	 * @param user
+	 * @param target
 	 */
 	void createEvent(ModelEvent target);
 
