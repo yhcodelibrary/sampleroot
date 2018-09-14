@@ -42,6 +42,9 @@ public class ManageSession {
 		
 	private <T extends ModelSession>  void setCommon(String area,String key,T value)
 	{
+		this.session.setAttribute("test","testes");
+		System.out.println("id1:" + this.session.getId());
+		
 		@SuppressWarnings("unchecked")
 		HashMap<String,ModelSession> hm = (HashMap<String,ModelSession>)this.session.getAttribute(area);
 		if(hm == null)
@@ -66,6 +69,9 @@ public class ManageSession {
 	@SuppressWarnings("unchecked")
 	private <T extends ModelSession> T getCommon(String area,String key)
 	{
+		String test = (String)this.session.getAttribute("test");
+		System.out.println("id2:" + this.session.getId());
+		System.out.println("aa2:" + test);
 		HashMap<String,ModelSession> hm = (HashMap<String,ModelSession>)this.session.getAttribute(area);
 		if(hm == null || hm.containsKey(key)==false)
 		{

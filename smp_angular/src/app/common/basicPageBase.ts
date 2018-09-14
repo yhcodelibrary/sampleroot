@@ -2,30 +2,40 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModelValidation } from '../models/modelValidation';
 
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { OnInit } from '@angular/core';
+import { OnInit,OnDestroy } from '@angular/core';
 import { UnloginAccessError } from '../common-ts/UnloginAccessError';
 import { ApplicationError } from '../common-ts/applicationError';
-export class BasicPageBase implements OnInit {
+
+
+export class BasicPageBase implements OnInit ,OnDestroy {
   
   protected isValid:boolean;
   protected valid:ModelValidation;
-
   
   ngOnInit()
   {
     this.isValid = true;
-    this.onInitPreLoad();
+    this.onInitStart();
     this.onInitLoad();
-    this.onInitLoadEnd();
+    this.onInitEnd();
   }
 
-  onInitPreLoad(){}
+  onInitStart(){}
   onInitLoad(){}
-  onInitLoadEnd(){}
+  onInitEnd(){}
 
-  constructor(protected http: HttpClient
-    ,protected router: Router)
+  ngOnDestroy()
+  {
+    this.onDestroyStart();
+    this.onDestroyLoad();
+    this.onDestroyEnd();
+  }
+
+  onDestroyStart(){}
+  onDestroyLoad(){}
+  onDestroyEnd(){}
+
+  constructor(protected router: Router)
   {
     //最初に空のバリデーションオブジェクトを作成
     this.valid = new ModelValidation();
@@ -34,6 +44,7 @@ export class BasicPageBase implements OnInit {
   protected getPostResult(response)
   {
     this.isValid = true;
+    this.valid = new ModelValidation();
     switch(response.status)
     {
       //成功
@@ -75,14 +86,5 @@ export class BasicPageBase implements OnInit {
   protected signout()
   {
     this.router.navigate(["/logout"]);
-
-    //var exit = require('exit');
-    //exit(1);
-    //process.exit(1);
-  }
-
-  private test(target:ModelValidation)
-  {
-
   }
 }

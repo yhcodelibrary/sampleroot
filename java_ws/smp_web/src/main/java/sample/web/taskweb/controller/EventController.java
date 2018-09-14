@@ -24,6 +24,7 @@ import sample.web.common.logic.ManageUtil;
 import sample.web.common.model.ModelValidErrors;
 import sample.web.taskweb.model.ModelEvent;
 import sample.web.taskweb.model.ModelJsonResult;
+import sample.web.taskweb.model.ModelRequestDateRange;
 import sample.web.taskweb.model.ModelRequestMonth;
 import sample.web.taskweb.model.ModelSessionTest;
 import sample.web.taskweb.service.ServiceEvent;
@@ -32,7 +33,7 @@ import sample.web.taskweb.service.ServiceEvent;
 
 @RestController
 @RequestMapping("/api/event")
-@CrossOrigin
+@CrossOrigin("http://localhost:4200")
 public class EventController {
 
 	@Autowired
@@ -105,16 +106,68 @@ public class EventController {
 		result.setModelResult(this.service.getMonthList(bean.getYear(), bean.getMonth()));
 
 		HttpHeaders responseHeaders = new HttpHeaders();
-		// ResponseEntity<String> result = new ResponseEntity<String>(model.GetJson(),
-		// responseHeaders, HttpStatus.OK);
+
 		ResponseEntity<String> response = new ResponseEntity<String>(this.mngJson.ConvertObjectToJson(result),
 				responseHeaders, HttpStatus.OK);
 
 		return response;
-		// return "get world";
 	}
 
+	/**
+	 * 指定した範囲のイベントデータを検索する。
+	 * @param bean
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/getRangeEvents")
+	ResponseEntity<String> getRangeEvents(@RequestBody @Valid ModelRequestDateRange bean, BindingResult result) throws Exception {
 
+		// 戻り値を作成
+		ModelJsonResult ret = new ModelJsonResult();
+
+		//バリデーションエラーがない場合に検索の実行
+		if(this.mngUtil.getErrorResult(ret, result)== true)
+		{
+			// 検索の実行
+			ret.setModelResult(this.service.getRangeList(this.mngUtil.getDate(bean.getFromDate()),this.mngUtil.getDate(bean.getToDate())));
+		}
+		HttpHeaders responseHeaders = new HttpHeaders();
+
+		ResponseEntity<String> response = new ResponseEntity<String>(this.mngJson.ConvertObjectToJson(ret),
+				responseHeaders, HttpStatus.OK);
+
+		return response;
+	}
+
+	/**
+	 * 指定した範囲のイベントデータを検索する。
+	 * @param bean
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/getEventSummary")
+	ResponseEntity<String> getEventSummary(@RequestBody @Valid ModelRequestDateRange bean, BindingResult result) throws Exception {
+
+		System.out.println("test2:" + bean);
+		// 戻り値を作成
+		ModelJsonResult ret = new ModelJsonResult();
+
+		System.out.println(bean);
+
+		//バリデーションエラーがない場合に検索の実行
+		if(this.mngUtil.getErrorResult(ret, result)== true)
+		{
+			ret.setModelResult(this.service.getEventSummary(bean.getType(),this.mngUtil.getDate(bean.getFromDate()),this.mngUtil.getDate(bean.getToDate())));
+		}
+
+		HttpHeaders responseHeaders = new HttpHeaders();
+		
+		ResponseEntity<String> response = new ResponseEntity<String>(this.mngJson.ConvertObjectToJson(ret),
+				responseHeaders, HttpStatus.OK);
+
+		return response;
+	}
+	
 	/**
 	 * イベントデータの新規登録を行う。
 	 * 

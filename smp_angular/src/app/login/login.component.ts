@@ -1,14 +1,107 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { SharedValueService } from '../service/sharedValue.service';
+import { BasicPageBase } from '../common/basicPageBase';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../environments/environment';
+import { HttpAccessService } from '../service/httpAccess.service';
+
+//https://stackoverflow.com/questions/48011849/angular-5-spring-boot-spring-security-login
 
 @Component({
     selector: 'login',
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css',
       ]
+      
 })
 
-export class LoginComponent{
+export class LoginComponent extends BasicPageBase{
     
+  userName:string;
+  password:string;
+  sampleCheck:boolean;
+
+  constructor(
+    router:Router,
+    private httpAccess:HttpAccessService,
+    private sharedValueService:SharedValueService) 
+  {
+    super(router);
+  }
+
+  onInitLoad()
+  {
+    this.sampleCheck = false;
+  }
+
+  onClickLogin()
+  {
+    
+    const body = {
+      userName : this.userName,
+      password : this.password
+    };
+
+    const self = this;
+
+    const func=(function(response) {
+      
+      let result = self.getPostResult(response);
+
+      //バリデーションエラーがない場合
+      if(self.isValid)
+      {
+        self.sharedValueService.onSharedDataChanged('pageupd','before');
+        self.router.navigate(['/calendar']);
+      }
+    });
+
+    this.httpAccess.postAuthApp(func,body,'api/account/login');
+
+
+    // this.http.post//<ModelEvent[]>
+    //   (environment.parentPath + 'api/account/login' + environment.endPath 
+    //   ,body,httpOptions)
+    // // subscribeの時点でModelEvent[]として受け取れる
+    // .subscribe(
+    //   response => {
+    //     console.debug(response.body);
+    //     console.debug(response.headers.keys.length);
+    //     for(let tes in response.headers.keys)
+    //     {
+    //       console.debug(tes);
+    //     }
+    //     console.debug(response.headers.get("Set-Cookie"));
+    //     let result = self.getPostResult(response);
+
+    //     console.debug();
+    //     //バリデーションエラーがない場合
+    //     if(self.isValid)
+    //     {
+    //       console.debug('tes2');
+    //       this.sharedValueService.onSharedDataChanged('pageupd','before');
+    //       this.router.navigate(['/calendar']);
+    //     }
+    //   },
+    //   error => console.log("Error: " + error)
+    // );
+
+  }
+
+  onChangeSample()
+  {
+    if(this.sampleCheck)
+    {
+      this.userName = "sample";
+      this.password = "sample1";
+    }
+    else
+    {
+      this.userName = "";
+      this.password = "";
+    }
+  }
 }
 
 //-------------------------------------------------OLD

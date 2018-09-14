@@ -12,6 +12,7 @@ import sample.web.common.define.OptimisticLockException;
 import sample.web.common.logic.ManageUtil;
 import sample.web.taskweb.dao.DaoEvent;
 import sample.web.taskweb.model.ModelEvent;
+import sample.web.taskweb.model.ModelEventSummary;
 
 @Service
 public class ServiceEventImpl implements ServiceEvent {
@@ -34,6 +35,18 @@ public class ServiceEventImpl implements ServiceEvent {
 		Date to = mngUtil.getDate(year, month + 1, 10);
 
 		return this.daoEvent.selectBetweenEventDate(from, to);
+	}
+	
+
+	public List<ModelEvent> getRangeList(Date from,Date to)
+	{
+		return this.daoEvent.selectBetweenEventDate(from, to);
+	}
+	
+
+	public List<ModelEventSummary> getEventSummary(String type,Date from,Date to)
+	{
+		return this.daoEvent.selectSummary(type, from, to);
 	}
 	
 	public void createEvent(ModelEvent target) {

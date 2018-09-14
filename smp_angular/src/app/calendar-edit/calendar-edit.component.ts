@@ -8,12 +8,12 @@ import { ManageMaster } from '../manage/manageMaster';
 
 //定義型読み込み
 import {ImportanceType} from '../common/enumDefine';
-import {PageBase} from '../common/pageBase';
 
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
 import { ModalPageBase } from '../common/modalPageBase';
+import { MasterValueService } from '../service/masterValue.service';
+import { HttpAccessService } from '../service/httpAccess.service';
 declare var jquery:any;
 declare var $ :any;
 
@@ -34,14 +34,18 @@ export class CalendarEditComponent extends ModalPageBase{
 
   constructor(activeModal: NgbActiveModal
     ,http: HttpClient
+    ,private masterValueService:MasterValueService
+    ,private httpAccess:HttpAccessService
     ,router: Router)
   {
-    super(activeModal,http,router);
+    super(activeModal,router);
   }
 
   onInitLoad(){
-    this.types = ManageMaster.getTypes(this.http);
-    this.categories = ManageMaster.getCategories(this.editTarget.type,this.http);
+    // this.types = ManageMaster.getTypes(this.http);
+    // this.categories = ManageMaster.getCategories(this.editTarget.type,this.http);
+    this.types = this.masterValueService.getTypes();
+    this.categories = this.masterValueService.getCategories(this.editTarget.type);
     
     let self = this;
     let picker = $('#eventDate');
@@ -75,27 +79,26 @@ export class CalendarEditComponent extends ModalPageBase{
 
   private ExePostEvent(url:string)
   {
-    let body =
+    const body =
       {
         target:this.editTarget.requestObject(),
       };
       
-    let self = this;
+    const self = this;
 
-    this.http.post<ModelEvent>(url ,this.editTarget.requestObject())
-    // subscribeの時点でModelEvent[]として受け取れる
-    .subscribe(
-      response => {
-        let result = self.getPostResult(response);        
+    const func = (function(response){
 
-        if(self.isValid)
-        {
-          let target:ModelEvent = ModelEvent.create(result);
-          self.targetMouthEvents[target.eventId] = target;
-          self.close();
-        }
-      },
-    );
+      let result = self.getPostResult(response.body);        
+
+      //バリデーションエラーがない場合
+      if(self.isValid)
+      {
+        let target:ModelEvent = ModelEvent.create(result);
+        self.targetMouthEvents[target.eventId] = target;
+        self.close();
+      }
+
+    });
   }
   
   onClickCancel(){
@@ -104,7 +107,7 @@ export class CalendarEditComponent extends ModalPageBase{
 
   onChangeType()
   {
-    this.categories = ManageMaster.getCategories(this.editTarget.type,this.http);
+    this.categories = this.masterValueService.getCategories(this.editTarget.type);
     this.categories.set("","");
     this.editTarget.category = "";
 

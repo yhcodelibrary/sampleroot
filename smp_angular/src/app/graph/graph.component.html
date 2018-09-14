@@ -1,27 +1,59 @@
-<!-- https://valor-software.com/ng2-charts/ -->
+<!-- https://valor-software.com/ng2-charts/ http://www.chartjs.org/samples/latest/ -->
 <div class="container">
   <div class="row">
-    <div class="col-3">
-      <div class=”form-group”>
-        <label>グラフ種別</label>
-        <select class="form-control">
-          <option value="1">棒グラフ</option>
-          <option value="2">円グラフ</option>
-        </select>
-      </div>
+    <div class="text-danger" *ngIf="valid.errorMessages.length != 0">
+        <ul>
+            <li *ngFor="let err of valid.errorMessages">
+                {{err}}
+            </li>
+        </ul>
     </div>
   </div>
   <div class="row">
-    <div class="col-12">
+    <div class="col-2">
+      <div class=”form-group”>
+        <label>収支</label>
+        <select class="form-control"
+          [(ngModel)]="type">
+          <option value="301">収入</option>
+          <option value="302">支出</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-9">
+      <div class=”form-group”>
+        <label>対象期間</label>
+        <div class="col-sm-9 form-inline">
+          <div class="input-daterange input-group" id="datepicker">
+            <input type="text" id="fromDateInput" 
+                class="form-control date"
+                [(ngModel)]="fromDate" 
+                [class.is-invalid]="isValidError('fromDate')"
+                #datePicker >
+            <span class="input-group-text">to</span>
+            <input type="text" id="toDateInput" 
+                class="form-control date"
+                [(ngModel)]="toDate" 
+                [class.is-invalid]="isValidError('toDate')"
+                #datePicker >
+                <span></span>
+                <button type="button" class="btn" (click)="onClickSearch()">検索</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-1">
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 back-ground">
       <div style="display: block">
-        <canvas baseChart
-                [datasets]="barChartData"
-                [labels]="barChartLabels"
-                [options]="barChartOptions"
-                [legend]="barChartLegend"
-                [chartType]="barChartType"
-                (chartHover)="chartHovered($event)"
-                (chartClick)="chartClicked($event)"></canvas>
+        <canvas baseChart #doughChart
+                    [data]="doughnutChartData"
+                    [labels]="doughnutChartLabels"
+                    [chartType]="doughnutChartType"
+                    (chartHover)="chartHovered($event)"
+                    (chartClick)="chartClicked($event)"></canvas>
       </div>
     </div>
   </div>

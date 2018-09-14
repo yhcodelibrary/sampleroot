@@ -16,19 +16,18 @@ export class PageBase extends BasicPageBase {
   ngOnInit()
   {
     this.isValid = true;
-    this.onInitPreLoad();
+    this.onInitStart();
     this.onInitLoad();
-    this.onInitLoadEnd();
+    this.onInitEnd();
   }
 
-  onInitPreLoad(){}
+  onInitStart(){}
   onInitLoad(){}
-  onInitLoadEnd(){}
+  onInitEnd(){}
 
-  constructor(http: HttpClient
-    ,router: Router)
+  constructor(router: Router)
   {
-    super(http,router);
+    super(router);
   }
 
   

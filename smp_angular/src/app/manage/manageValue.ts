@@ -1,6 +1,7 @@
 
 export class ManageValue {
 
+    public static loading:string = "before";
     private static values : Map<string, any> = new Map<string, any>();
 
     static setValue<T>(key:string,target:T)

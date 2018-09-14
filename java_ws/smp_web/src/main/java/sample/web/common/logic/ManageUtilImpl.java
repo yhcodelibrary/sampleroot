@@ -1,5 +1,7 @@
 package sample.web.common.logic;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
@@ -24,6 +26,16 @@ public class ManageUtilImpl implements ManageUtil {
 		Date result = new Date(year - 1900, month, day);
 		
 		return result;
+		
+	}
+
+	public Date getDate(String target) throws ParseException 
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+		Date date = sdf.parse(target);
+		
+		return date;
+		
 	}
 	
 	public Boolean getErrorResult(ModelJsonResult ret ,BindingResult result)

@@ -7,10 +7,9 @@ import { Router } from "@angular/router";
 export class ModalPageBase extends PageBase {
     
   constructor(protected activeModal: NgbActiveModal
-    ,http: HttpClient
     ,router: Router)
   {
-    super(http,router);
+    super(router);
   }
 
   public close()

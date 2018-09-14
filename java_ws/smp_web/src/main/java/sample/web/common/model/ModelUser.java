@@ -1,8 +1,15 @@
 package sample.web.common.model;
 
+import java.io.Serializable;
+
 public class ModelUser 
 	extends ModelTableCommon
-	implements ModelSession{
+	implements ModelSession , Serializable{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3564805125571984737L;
 	
 	public int userId;
 	public String userName;

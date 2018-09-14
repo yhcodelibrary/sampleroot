@@ -28,8 +28,8 @@ export default class CommonErrorHandler extends  ErrorHandler {
 
         if(error instanceof UnloginAccessError)
         {
-            this.router.navigate(['/logout']);
-            location.reload();
+            // this.router.navigate(['/logout']);
+            // location.reload();
             return;
         }
         if(error instanceof ApplicationError)

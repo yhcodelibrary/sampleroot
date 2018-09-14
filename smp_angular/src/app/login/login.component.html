@@ -1,24 +1,24 @@
+<div class="top-area"></div>
 <div class="wrapper">
 	<div class="container">
 		<h1>Welcome</h1>
 		
-		<form class="form">
-			<input type="text" placeholder="Username" ng-model="username">
-			<input type="password" placeholder="Password" ng-model="password">
-			<button type="button" id="login-button" (click)="onLogin()">Login</button>
-		</form>
+		<div class="card text-danger" *ngIf="valid.errorMessages.length != 0">
+			<ul>
+				<li *ngFor="let err of valid.errorMessages">
+					{{err}}
+				</li>
+			</ul>
+		</div>
+		<div class="form">
+			<input type="checkbox" (change)="onChangeSample()" 
+					[(ngModel)]="sampleCheck">サンプルユーザーを使用
+			<input type="text" placeholder="Username"
+				[(ngModel)]="userName">
+			<input type="password" placeholder="Password"
+				[(ngModel)]="password">
+			<button type="button" id="login-button" (click)="onClickLogin()">Login</button>
+		</div>
 	</div>
-	
-	<ul class="bg-bubbles">
-		<li></li>
-		<li></li>
-		<li></li>
-		<li></li>
-		<li></li>
-		<li></li>
-		<li></li>
-		<li></li>
-		<li></li>
-		<li></li>
-	</ul>
 </div>
+	

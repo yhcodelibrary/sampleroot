@@ -8,11 +8,19 @@ import org.apache.ibatis.annotations.Param;
 
 import sample.web.common.define.OptimisticLockException;
 import sample.web.taskweb.model.ModelEvent;
+import sample.web.taskweb.model.ModelEventSummary;
 
+/**
+ * @author train
+ *
+ */
 @Mapper
 public interface DaoEvent {
 
 	List<ModelEvent> selectBetweenEventDate(@Param("from") Date from, @Param("to") Date to);
+	
+
+	List<ModelEventSummary> selectSummary(@Param("type") String type,@Param("from") Date from, @Param("to") Date to);
 	
 	/**
 	 * Userテーブルへ新規登録
@@ -20,5 +28,11 @@ public interface DaoEvent {
 	 */
 	void createEvent(ModelEvent target);
 
+	
+	/**
+	 * @param target
+	 * @return
+	 * @throws OptimisticLockException
+	 */
 	int updateEvent(ModelEvent target) throws OptimisticLockException;
 }

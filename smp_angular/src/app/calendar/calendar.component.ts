@@ -8,6 +8,8 @@ import { CalendarEditComponent} from '../calendar-edit/calendar-edit.component';
 import { ModelEvent } from '../models/modelEvent';
 import { EditInfo } from '../models/editInfo';
 
+import { trigger, state, transition, style, animate } from '@angular/animations';
+
 //定義型読み込み
 import {PageBase} from '../common/pageBase';
 
@@ -15,12 +17,27 @@ import { ManageUtil } from '../manage/magangeUtil';
 import { ManageValue } from '../manage/manageValue';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
-import { ManageMaster } from '../manage/manageMaster';
+import { SharedValueService } from '../service/sharedValue.service'
+import { Subscription, Observable } from 'rxjs';
+import { HttpAccessService } from '../service/httpAccess.service';
+import { MasterValueService } from '../service/masterValue.service';
 
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
-  styleUrls: ['./calendar.component.css']
+  styleUrls: ['./calendar.component.css'],
+  animations: [
+    //panelOpenTriggerを設定されたステートに従って動的に切り替える
+    trigger('panelOpenTrigger', [
+      state('before', style({ 
+        //opacity: 0.1 , 
+        transform:"scaleY(0)" })),
+      state('after', style({ 
+        //opacity: 1.0 , 
+        transform:"scaleY(1)" })),
+      transition('before => after', animate('200ms ease-in'))
+    ])
+  ]
 })
 
 export class CalendarComponent extends PageBase  {
@@ -52,12 +69,42 @@ export class CalendarComponent extends PageBase  {
   targetYear:number;
   targetMouth:number;
 
+  todayState:string = 'before';
+
+  /**
+   * subscribe を保持するための Subscription
+   *
+   * @private
+   * @type {Subscription}
+   * @memberof AppComponent
+   */
+  private subscription: Subscription;
+
+  /**
+   * コンストラクタ. 
+   *
+   * @param {SharedValueService} sharedValueService 共通値サービス
+   * @memberof AppComponent
+   */
   constructor(private chRef: ChangeDetectorRef
     ,private modalService: NgbModal
-    ,http: HttpClient
+    ,private sharedValueService: SharedValueService
+    ,private httpAccess:HttpAccessService
+    ,private masterValueService: MasterValueService
     ,router: Router){
 
-    super(http,router);
+    super(router);
+  }
+
+  
+  /**
+   * コンポーネント終了時の処理
+   *
+   * @memberof CalendarComponent
+   */
+  onDestroyLoad() {
+    //  リソースリーク防止のため CommonService から subcribe したオブジェクトを破棄する
+    this.subscription.unsubscribe();
   }
 
   onInitLoad(){
@@ -65,6 +112,15 @@ export class CalendarComponent extends PageBase  {
     var today = new Date();
 
     this.targetEvent = new ModelEvent();
+
+    // サービスで共有しているデータが更新されたら発火されるイベントをキャッチする
+    this.subscription = this.sharedValueService
+      .initSharedDataSource("calupd",(
+      msg => {
+        console.log('[sharedValueService cal] shared data updated.' + msg);
+        this.todayState = msg;
+      }
+    ));
 
     this.createCalendar(today.getFullYear(),today.getMonth());
 
@@ -143,6 +199,8 @@ export class CalendarComponent extends PageBase  {
       month = 0;
     }
   
+    this.sharedValueService.onSharedDataChanged('pageupd','before');
+
     //カレンダーの更新
     this.createCalendar(year,month);
   }
@@ -150,17 +208,28 @@ export class CalendarComponent extends PageBase  {
   //日のクリックイベント
   onClickDate(day:Date)
   {
+    this.sharedValueService.onSharedDataChanged('calupd','before');
     this.selectedDate = day;
     this.setDayEvents(day);
+    
+    //同一スレッド上でstateを切り替えないようにするためタイマーで分離する
+    let isExe = true;
+    let self = this;
+    Observable.interval(1)
+    .takeWhile(() => isExe)
+    .subscribe(i => { 
+      self.sharedValueService.onSharedDataChanged('calupd','after');
+      isExe = false;
+    });
   }
 
   getTypeName(model:ModelEvent)
   {
-    return ManageMaster.getTypes(this.http).get(model.type);
+    return this.masterValueService.getTypes().get(model.type);
   }
   getCategoryName(model:ModelEvent)
   {
-    let name =ManageMaster.getCategories(model.type,this.http).get(model.category);
+    const name = this.masterValueService.getCategories(model.type).get(model.category);
     return name;
   }
 
@@ -181,9 +250,6 @@ export class CalendarComponent extends PageBase  {
     this.targetMouthEvents = [];
     ///////////////////////////////////
     
-    // let headers = new HttpHeaders();    
-    // headers.append('Content-Type', 'application/x-www-form-urlencoded');
-    // ,{headers: headers}
     let body = 
       {
         "year":targetY,
@@ -194,45 +260,35 @@ export class CalendarComponent extends PageBase  {
     
     this.monthEvents = [];
     this.monthEventDisp = [];
-    // let target = new Date(targetY,targetM,1);
-    // for(let i=1;i < 32;i++)
-    // {
-    //   this.monthEvents[ManageUtil.convertDateToString(target)] = new Array<ModelEvent>();
-    //   target = this.addDate(target,1);
-    // }
+    
+    const func=(function(response){
+      
+      let result = self.getPostResult(response.body);
 
-    this.http.post//<ModelEvent[]>
-      (environment.parentPath + 'api/event/getMonthEvents' + environment.endPath 
-      ,body)
-    // subscribeの時点でModelEvent[]として受け取れる
-    .subscribe(
-      response => {
-        let result = self.getPostResult(response);
-
-        for(let i = 0; i < result.length; i++) {
-          let tmp = ModelEvent.create(result[i]);
-          //let events = ManageValue.getValue<ModelEvent[]>("targetMouthEvents");
-          //events[tmp.eventId] = tmp;
-          //ManageValue.setValue("targetMouthEvents",events);
-          self.targetMouthEvents[tmp.eventId] = tmp;
-          let evekey = tmp.eventDate.getMonth()*100 +tmp.eventDate.getDate();
-          if(self.monthEvents[evekey] == undefined)
-          {
-            self.monthEvents[evekey] = new Array<ModelEvent>();
-          }
-          if(self.monthEvents[evekey].length >= 2)
-          {
-            self.monthEventDisp[evekey] = true;
-          }
-          else
-          {
-            self.monthEvents[evekey].push(tmp);
-          }
+      for(let i = 0; i < result.length; i++) {
+        let tmp = ModelEvent.create(result[i]);
+        //イベントIDをキーにマップに登録する
+        self.targetMouthEvents[tmp.eventId] = tmp;
+        let evekey = tmp.eventDate.getMonth()*100 +tmp.eventDate.getDate();
+        if(self.monthEvents[evekey] == undefined)
+        {
+          self.monthEvents[evekey] = new Array<ModelEvent>();
         }
-      },
-    //error => console.log("Error: ")
-    );
-
+        if(self.monthEvents[evekey].length >= 2)
+        {
+          self.monthEventDisp[evekey] = true;
+        }
+        else
+        {
+          self.monthEvents[evekey].push(tmp);
+        }
+      }
+      
+      self.sharedValueService.onSharedDataChanged('pageupd','after');
+    });
+    
+    this.httpAccess.postAuthApp(func,body,'api/event/getMonthEvents');
+    
     //対象年月の１日を取得
     let target = new Date(targetY,targetM,1);
     
@@ -383,10 +439,10 @@ export class CalendarComponent extends PageBase  {
       let cls :string;
       switch(model.type)
       {
-        case "1":
+        case "301":
           cls = "income";
           break;
-        case "2":
+        case "302":
           cls = "expence";
           break;
       }

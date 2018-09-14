@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
 import { ModelCommonValues } from '../models/modelCommonValues';
-import { ModelJsonResult } from '../models/ModelJsonResult';
+import { ModelJsonResult } from '../models/modelJsonResult';
 
 @Injectable()
 export class ManageMaster {

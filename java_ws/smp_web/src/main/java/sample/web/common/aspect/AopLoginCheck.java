@@ -13,21 +13,21 @@ import sample.web.common.model.ModelUser;
 
 @Aspect
 @Component
-//@Order(value=100)
+// @Order(value=100)
 public class AopLoginCheck {
 
 	@Autowired
 	ManageSession session;
 
 	@Before("execution(* sample.web.taskweb..*Controller.*(..))")
-	public void beforeLoginCheck(JoinPoint jp) throws Throwable  {
+	public void beforeLoginCheck(JoinPoint jp) throws Throwable {
 
 		System.out.println("[beforeLoginCheck]====================================");
 		System.out.println("[beforeLoginCheck]class:" + jp.getTarget().getClass().toString());
 		System.out.println("[beforeLoginCheck]method:" + jp.getSignature().getName());
-		ModelUser user = this.session.getNever(CommonConst.SystemSession.LoginInfo,ModelUser.class);
-		
-		if(user == null) {
+		ModelUser user = this.session.getNever(CommonConst.SystemSession.LoginInfo, ModelUser.class);
+
+		if (user == null) {
 			throw new UnLoginException();
 		}
 	}

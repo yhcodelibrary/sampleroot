@@ -63,6 +63,10 @@ body:-ms-input-placeholder { /* Internet Explorer 10+ */
     transform: translateY(85px);
 }
 
+div.top-area{
+	height:30rem;
+}
+
 .container{
 	max-width: 600px;
 	margin: 0 auto;
@@ -77,12 +81,12 @@ body:-ms-input-placeholder { /* Internet Explorer 10+ */
 	font-weight: 200;
 }
 
-form{
+div.form{
 	padding: 20px 0;
 	position: relative;
 	z-index: 2;
 }
-form input{
+div.form input[type="text"],input[type="password"]{
 	display: block;
 	appearance: none;
 	outline: 0;
@@ -102,18 +106,18 @@ form input{
 	transition-duration: 0.25s;
 	font-weight: 300;
 }
-form input:hover{
+div.form input[type="text"]:hover,input[type="password"]:hover{
 	background-color: fade(white, 40%);
 }
 		
-form input:focus{
+div.form input[type="text"]:focus,input[type="password"]:focus{
 	background-color: white;
 	width: 300px;
 			
 	color: green;
 }
 	
-form button{
+div.form button{
 	appearance: none;
 	outline: 0;
 	background-color: white;
@@ -127,7 +131,7 @@ form button{
 	transition-duration: 0.25s;
 }
 
-form button:hover{
+div.form button:hover{
     background-color: rgb(245, 247, 249);
 }
 

@@ -1,3 +1,60 @@
-<p>
-  all-list works!
-</p>
+<div class="container">
+  <div class="row">
+    <div class="text-danger" *ngIf="valid.errorMessages.length != 0">
+        <ul>
+            <li *ngFor="let err of valid.errorMessages">
+                {{err}}
+            </li>
+        </ul>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-10">
+      <div class=”form-group”>
+        <label>対象期間</label>
+        <div class="col-sm-9 form-inline">
+          <div class="input-daterange input-group" id="datepicker">
+            <input type="text" id="fromDateInput" 
+                class="form-control date"
+                [(ngModel)]="fromDate" 
+                [class.is-invalid]="isValidError('fromDate')"
+                #datePicker >
+            <span class="input-group-text">to</span>
+            <input type="text" id="toDateInput" 
+                class="form-control date"
+                [(ngModel)]="toDate" 
+                [class.is-invalid]="isValidError('toDate')"
+                #datePicker >
+                <button type="button" class="btn" (click)="onClickSearch()">検索</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-2">
+    </div>
+  </div>
+  <div class="row"  [@panelOpenTrigger]='state'>
+    <div class="col-12 back-ground" *ngIf="targetEvents.length != 0">
+      <table class="table table-striped table-condensed list">
+        <thead>
+          <tr>
+            <th class="text-center">日付</th>
+            <th class="text-center">金額</th>
+            <th class="text-center">収支</th>
+            <th class="text-center">種別</th>
+            <th class="text-center">詳細</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ev of targetEvents">
+            <td class="text-center">{{ev.eventDate}}</td>
+            <td class="text-right">{{ev.amount | number}}</td>
+            <td class="text-center">{{getTypeName(ev)}}</td>
+            <td>{{getCategoryName(ev)}}</td>
+            <td>{{ev.detail}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

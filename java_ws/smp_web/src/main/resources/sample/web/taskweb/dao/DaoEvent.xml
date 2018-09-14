@@ -3,10 +3,22 @@
 <mapper namespace="sample.web.taskweb.dao.DaoEvent">
 	<select id="selectBetweenEventDate"
 		resultType="sample.web.taskweb.model.ModelEvent">
-		SELECT eventId, type, category,detail,note,eventDate ,ssVersion 
+		SELECT eventId, type, category , detail , note , eventDate , amount, ssVersion 
 		FROM T_SMP_Event 
 		WHERE eventDate BETWEEN #{from,jdbcType=DATE} AND #{to,jdbcType=DATE}
 		AND ssIsDelete = 0
+	</select>
+	<select id="selectSummary"
+		resultType="sample.web.taskweb.model.ModelEventSummary">
+		SELECT ev.type, cv.valueText AS itemText , SUM(ev.amount) AS amount
+		FROM T_SMP_Event AS ev
+		INNER JOIN M_SMP_CommonValues AS cv
+		ON ev.category = cv.keyValue
+		WHERE ev.eventDate BETWEEN #{from,jdbcType=DATE} AND #{to,jdbcType=DATE}
+		AND ev.ssIsDelete = 0
+		AND ev.type = #{type}
+		GROUP BY ev.type, ev.category, cv.valueText
+		Order by ev.type, ev.category
 	</select>
 	<insert id="createEvent">
 		INSERT INTO T_SMP_Event
@@ -14,7 +26,7 @@
 		, detail , note , eventDate
 		, ssCreateDate , ssCreatePrg , ssUpdateDate , ssUpdatePrg , ssVersion )
 		VALUES ( #{userId} , #{type} , #{category} , #{amount}
-		, #{detail} , #{note} , cast('2018-04-03' as date)
+		, #{detail} , #{note} , #{eventDate}
 		, #{ssCreateDate} , #{ssCreatePrg} , #{ssUpdateDate} , #{ssUpdatePrg} , #{ssVersion} );
 	<selectKey resultType="int" keyProperty="eventId"
 		order="AFTER">
