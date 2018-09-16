@@ -18,7 +18,7 @@ export class LogoutComponent extends BasicPageBase {
 
   onInitLoad() {
     
-    this.httpAccess.postAuthApp({},null,'api/account/logout');
+    this.httpAccess.postApp({},null,'api/account/logout');
 
     this.router.navigate(['']);
   }

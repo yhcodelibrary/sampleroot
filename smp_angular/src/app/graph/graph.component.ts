@@ -7,6 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { HttpAccessService } from '../service/httpAccess.service';
+import { ManageUtil } from '../manage/magangeUtil';
 declare var $ :any;
 
 //"../node_modules/chart.js/src/chart.js",
@@ -67,15 +68,17 @@ export class GraphComponent extends PageBase {
     });
     //初期値をDatePickerに設定
     tpicker.datepicker("setDate",this.toDate);
+    
+    const today = new Date();
+    //対象年月の１日を取得
+    let start = new Date(today.getFullYear(),today.getMonth(),1);
+    //翌月の１日を取得
+    let end = new Date(today.getFullYear(),today.getMonth()+1,1);
 
-    this.barChartData = [
-      {data: [6500], label: '食費'},
-      {data: [70000], label: '住居費'},
-      {data: [4000], label: '水道光熱費'},
-      {data: [50000], label: '娯楽費'},
-      {data: [5000], label: '交通・通信費'},
-      {data: [2000], label: '交際費'},
-    ];
+    this.fromDate = ManageUtil.convertDateToString(start);
+    this.toDate = ManageUtil.convertDateToString(end);
+
+    this.onClickSearch();
   }
 
   public barChartOptions:any = {
@@ -84,27 +87,6 @@ export class GraphComponent extends PageBase {
   };
   
   public doughnutChartType:string = 'doughnut';
-
-  public barChartType:string = 'bar';
-  public barChartLegend:boolean = true;
- 
-  // public barChartLabels:string[] = ['2006', '2007', '2008', '2009', '2010', '2011', '2012'];
-  // public barChartData:any[] = [
-  //   {data: [65, 59, 80, 81, 56, 55, 40], label: 'Series A'},
-  //   {data: [28, 48, 40, 19, 86, 27, 90], label: 'Series B'}
-  // ];
- 
-  public barChartLabels:string[] = ['支出'];
-  public barChartData:any[];
-  // public barChartData:any[] = [
-  //   {data: [6500], label: '食費'},
-  //   {data: [70000], label: '住居費'},
-  //   {data: [4000], label: '水道光熱費'},
-  //   {data: [50000], label: '娯楽費'},
-  //   {data: [5000], label: '交通・通信費'},
-  //   {data: [2000], label: '交際費'},
-  // ];
-
   public doughnutChartLabels:string[] = ['食費', 
     '住居費', 
     '水道光熱費', 
@@ -160,37 +142,5 @@ export class GraphComponent extends PageBase {
  
   public chartHovered(e:any):void {
     console.log(e);
-  }
- 
-  private setBarData(data,label){
-    
-    let clone = JSON.parse(JSON.stringify(this.barChartData));
-    for(let i = 0 ; i < data.length;i++)
-    {
-      clone[i].data = [data[i]];
-    }
-    //clone[0].data = data;
-    //clone[0].label = label;
-    this.barChartData = clone;
-  }
-  public randomize():void {
-    // Only Change 3 values
-    let data = [
-      Math.round(Math.random() * 100),
-      59,
-      80,
-      (Math.random() * 100),
-      56,
-      (Math.random() * 100),
-      40];
-    let clone = JSON.parse(JSON.stringify(this.barChartData));
-    clone[0].data = data;
-    this.barChartData = clone;
-    /**
-     * (My guess), for Angular to recognize the change in the dataset
-     * it has to change the dataset variable directly,
-     * so one way around it, is to clone the data, change it and then
-     * assign it;
-     */
   }
 }

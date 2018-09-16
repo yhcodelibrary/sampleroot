@@ -60,6 +60,7 @@ System.out.println("testt");
 		}		
 		else
 		{
+			target.setUserId(1);
 			//情報をセッションに格納
 			this.session.setNever(CommonConst.SystemSession.LoginInfo,target,ModelUser.class);			
 		}

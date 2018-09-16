@@ -10,7 +10,8 @@ import { AppComponent }  from './app.component';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
 
 
-import CommonErrorHandler  from './common-ts/commonErrorHandler';
+//import  CommonErrorHandler  from './common-ts/commonErrorHandler';
+import { CommonErrorHandler } from './common-ts/commonErrorHandler';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -31,7 +32,6 @@ import{ Location} from '@angular/common';
 import { CalendarComponent } from './calendar/calendar.component'; 
 import { LoginComponent } from './login/login.component';
 import { CalendarEditComponent } from './calendar-edit/calendar-edit.component';
-import { TodoListComponent } from './todo-list/todo-list.component';
 import { environment } from '../environments/environment';
 import { AllListComponent } from './all-list/all-list.component';
 import { GraphComponent } from './graph/graph.component';
@@ -41,6 +41,7 @@ import { LogoutComponent } from './logout/logout.component';
 import { Observable,Subscription } from 'rxjs';
 import { HttpAccessService } from './service/httpAccess.service';
 import { MasterValueService } from './service/masterValue.service';
+//import CommonErrorHandler from './common-ts/commonErrorHandler';
 
 
 @NgModule({
@@ -72,11 +73,12 @@ import { MasterValueService } from './service/masterValue.service';
     LoginComponent,
     AllListComponent,
     GraphComponent,
-    TodoListComponent,
     LogoutComponent,
     CalendarEditComponent,
   ],
-  providers: [ { provide: ErrorHandler, useClass: CommonErrorHandler }
+  providers: [ 
+    CommonErrorHandler
+    , { provide: ErrorHandler, useClass: CommonErrorHandler }
     ,SharedValueService 
     ,HttpAccessService
     ,MasterValueService

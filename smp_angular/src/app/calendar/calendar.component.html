@@ -140,7 +140,7 @@
         <div class="col-12 eventbox-main">
             <div class="row">
                 <div class="col-10">
-                    <div class="day-detail" *ngIf="selectedDate !== null && selectedDate !== undefind">
+                    <div class="day-detail" *ngIf="selectedDate != null">
                         {{selectedDate.getFullYear()}}/{{selectedDate.getMonth()+1}}/{{selectedDate.getDate()}}
                     </div>
                 </div>
@@ -153,7 +153,8 @@
                     <thead>
                         <tr>
                             <th style="width: 10%;">収支</th>
-                            <th style="width: 15%;">L1</th>
+                            <th style="width: 15%;">種別</th>
+                            <th style="width: 15%;">金額</th>
                             <th style="width: 40%;">詳細</th>
                             <th style="width: 20%;"></th>
                         </tr>
@@ -162,10 +163,11 @@
                         <tr *ngFor="let ev of targetDayEvents">
                             <td>{{getTypeName(ev)}}</td>
                             <td>{{getCategoryName(ev)}}</td>
+                            <td>{{ev.amount}}</td>
                             <td>{{ev.detail}}</td>
                             <td>
                                 <button class="btn btn-success" (click)="onClickEditOpen(ev)">更新</button>
-                                <button class="btn btn-warning">削除</button>
+                                <button class="btn btn-warning" (click)="onClickDelete(ev)">削除</button>
                             </td>
                         </tr>
                     </tbody>

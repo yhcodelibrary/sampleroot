@@ -8,6 +8,13 @@
 		WHERE eventDate BETWEEN #{from,jdbcType=DATE} AND #{to,jdbcType=DATE}
 		AND ssIsDelete = 0
 	</select>
+	<select id="selectModelEvent"
+		resultType="sample.web.taskweb.model.ModelEvent">
+		SELECT eventId, type, category , detail , note , eventDate , amount, ssVersion 
+		FROM T_SMP_Event 
+		WHERE eventId = #{id}
+		AND ssIsDelete = 0
+	</select>
 	<select id="selectSummary"
 		resultType="sample.web.taskweb.model.ModelEventSummary">
 		SELECT ev.type, cv.valueText AS itemText , SUM(ev.amount) AS amount
@@ -24,10 +31,11 @@
 		INSERT INTO T_SMP_Event
 		( userId , type , category ,amount
 		, detail , note , eventDate
-		, ssCreateDate , ssCreatePrg , ssUpdateDate , ssUpdatePrg , ssVersion )
+		, ssCreateDate , ssCreatePrg , ssUpdateDate , ssUpdatePrg , ssVersion , ssIsDelete )
 		VALUES ( #{userId} , #{type} , #{category} , #{amount}
 		, #{detail} , #{note} , #{eventDate}
-		, #{ssCreateDate} , #{ssCreatePrg} , #{ssUpdateDate} , #{ssUpdatePrg} , #{ssVersion} );
+		, #{ssCreateDate} , #{ssCreatePrg} , #{ssUpdateDate} , #{ssUpdatePrg} , #{ssVersion}
+		, #{ssIsDelete} );
 	<selectKey resultType="int" keyProperty="eventId"
 		order="AFTER">
 		select @@IDENTITY
@@ -40,6 +48,12 @@
 		, ssUpdateDate = #{ssUpdateDate} 
 		, ssUpdatePrg = #{ssUpdatePrg}  
 		, ssVersion = ssVersion + 1 
+		WHERE userId =#{userId}  AND eventId =#{eventId}   
+		AND ssVersion = #{ssVersion}  
+		AND ssIsDelete ='0' ;
+	</update>
+	<update id="updateDeleteEvent">
+		UPDATE T_SMP_Event SET ssIsDelete = '1'
 		WHERE userId =#{userId}  AND eventId =#{eventId}   
 		AND ssVersion = #{ssVersion}  
 		AND ssIsDelete ='0' ;

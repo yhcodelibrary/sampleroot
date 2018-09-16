@@ -9,6 +9,7 @@ export class ModelEvent {
     category:string;
     subCategory:string;
 
+    amount:string;
     detail:string;
     note:string;
     eventDate: Date;
@@ -21,35 +22,6 @@ export class ModelEvent {
     }
     get eventDateString() { return ManageUtil.convertDateToString(this.eventDate); }
 
-    // public getTypeName():string
-    // {
-    //     let list = ManageMaster.getTypes();
-    //     if(list.has(this.type))
-    //     {
-    //         return list.get(this.type);
-    //     }
-    //     return "";
-    // }
-
-    // public getCategoryName():string
-    // {
-    //     let list = ManageMaster.getCategories(this.type);
-    //     if(list.has(this.category))
-    //     {
-    //         return list.get(this.category);
-    //     }
-    //     return "";
-    // }
-
-    // public getSubCategoryName():string
-    // {
-    //     let list = ManageMaster.getSubCategories(this.category);
-    //     if(list.has(this.subCategory))
-    //     {
-    //         return list.get(this.subCategory);
-    //     }
-    //     return "";
-    // }
     public clone():ModelEvent{
         
         let tmp = new ModelEvent();
@@ -89,6 +61,7 @@ export class ModelEvent {
         to.category = from.category;
         to.subCategory = from.subCategory;
         to.detail= from.detail;
+        to.amount = from.amount;
         to.note = from.note;
         to.ssVersion = from.ssVersion;
     }

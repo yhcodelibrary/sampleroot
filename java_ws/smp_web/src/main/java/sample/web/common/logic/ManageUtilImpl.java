@@ -11,7 +11,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import sample.web.common.define.CommonConst;
+import sample.web.common.model.ModelActionInfo;
+import sample.web.common.model.ModelTableCommon;
 import sample.web.common.model.ModelValidErrors;
 import sample.web.taskweb.model.ModelJsonResult;
 
@@ -20,6 +24,9 @@ public class ManageUtilImpl implements ManageUtil {
 
 	@Autowired
 	MessageSource messageSource;
+	
+	@Autowired
+	ManageSession session;
 	
 	public Date getDate(int year,int month, int day) 
 	{
@@ -67,5 +74,33 @@ public class ManageUtilImpl implements ManageUtil {
 		return false;
 	}
 
+	public void setCreateInfo(ModelTableCommon tb) throws JsonProcessingException
+	{
+		ModelActionInfo info = this.session.getNever(CommonConst.SystemSession.ActionInfo, ModelActionInfo.class);
+		
+		this.setCreateInfo(tb, info.getActionName());
+	}
+	public void setCreateInfo(ModelTableCommon tb, String prgName)
+	{
+		tb.setSsCreateDate(new Date());
+		tb.setSsCreatePrg(prgName);
+		tb.setSsUpdateDate(new Date());
+		tb.setSsUpdatePrg(prgName);
+		tb.setSsVersion(1);
+		tb.setSsIsDelete(0);
+	}
+
+	public void setUpdateInfo(ModelTableCommon tb) throws JsonProcessingException 
+	{
+		ModelActionInfo info = this.session.getNever(CommonConst.SystemSession.ActionInfo, ModelActionInfo.class);
+
+		this.setUpdateInfo(tb, info.getActionName());
+	}
+	public void setUpdateInfo(ModelTableCommon tb, String prgName) 
+	{
+		tb.setUserId(1);
+		tb.setSsUpdateDate(new Date());
+		tb.setSsUpdatePrg(prgName);
+	}
 }
 	

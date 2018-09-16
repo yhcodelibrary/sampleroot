@@ -1,8 +1,5 @@
 package sample.web.taskweb.controller;
 
-import java.util.Locale;
-
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,22 +8,20 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import sample.web.common.define.CommonConst;
 import sample.web.common.logic.ManageJson;
 import sample.web.common.logic.ManageSession;
 import sample.web.common.logic.ManageUtil;
-import sample.web.common.model.ModelValidErrors;
 import sample.web.taskweb.model.ModelEvent;
 import sample.web.taskweb.model.ModelJsonResult;
 import sample.web.taskweb.model.ModelRequestDateRange;
+import sample.web.taskweb.model.ModelRequestDelete;
 import sample.web.taskweb.model.ModelRequestMonth;
-import sample.web.taskweb.model.ModelSessionTest;
 import sample.web.taskweb.service.ServiceEvent;
 
 //@SpringBootApplication
@@ -51,43 +46,6 @@ public class EventController {
 	@Autowired
 	ServiceEvent service;
 	
-//	@RequestMapping("/get")
-//	String get(HttpSession httpSession) throws Exception {
-//
-//		ModelSessionValue m = new ModelSessionValue();
-//		m.setUserId((int)(Math.random() * 100));
-//		session.<ModelSessionValue>setTemporary("key", m, ModelSessionValue.class);
-//
-//		return String.valueOf(m.getUserId());
-//		// return "get world";
-//	}
-//
-//	@RequestMapping("/get2")
-//	String get2(HttpSession httpSession) throws Exception {
-//
-//		ModelSessionValue model = session.<ModelSessionValue>getTemporary("key", ModelSessionValue.class);
-//
-//		return String.valueOf(model.getUserId());
-//		// return "get world";
-//	}
-
-//	@RequestMapping("/get3")
-//	String get3(HttpSession httpSession) throws Exception {
-//
-//		ModelEvent te = this.service.get();
-//
-//		return String.valueOf(te.getDetail());
-//		// return "get world";
-//	}
-
-	@RequestMapping("/test")
-	String test(HttpSession httpSession) throws Exception {
-
-		ModelSessionTest m = (ModelSessionTest) httpSession.getAttribute("test");
-
-		return m.getName();
-		// return "get world";
-	}
 
 	/**
 	 * 指定した月のイベントデータを検索する。
@@ -96,7 +54,7 @@ public class EventController {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping("/getMonthEvents")
+	@PostMapping("/getMonthEvents")
 	ResponseEntity<String> getMonthEvents(@RequestBody ModelRequestMonth bean) throws Exception {
 
 		// 戻り値を作成
@@ -119,7 +77,7 @@ public class EventController {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping("/getRangeEvents")
+	@PostMapping("/getRangeEvents")
 	ResponseEntity<String> getRangeEvents(@RequestBody @Valid ModelRequestDateRange bean, BindingResult result) throws Exception {
 
 		// 戻り値を作成
@@ -145,7 +103,7 @@ public class EventController {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping("/getEventSummary")
+	@PostMapping("/getEventSummary")
 	ResponseEntity<String> getEventSummary(@RequestBody @Valid ModelRequestDateRange bean, BindingResult result) throws Exception {
 
 		System.out.println("test2:" + bean);
@@ -176,7 +134,7 @@ public class EventController {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping("/createEvent")
+	@PostMapping("/createEvent")
 	ResponseEntity<String> createEvent(@RequestBody @Valid ModelEvent target, BindingResult result) throws Exception {
 
 		// 戻り値を作成
@@ -185,7 +143,9 @@ public class EventController {
 		//バリデーションエラーがない場合に登録処理を行う
 		if(this.mngUtil.getErrorResult(ret, result)== true)
 		{
-			this.service.createEvent(target);
+			ModelEvent item = this.service.createEvent(target);
+			
+			ret.setModelResult(item);
 		}
 		
 		//レスポンス情報を作成
@@ -205,7 +165,7 @@ public class EventController {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping("/updateEvent")
+	@PostMapping("/updateEvent")
 	ResponseEntity<String> updateEvent(@RequestBody @Valid ModelEvent target, BindingResult result) throws Exception {
 
 		// 戻り値を作成
@@ -214,8 +174,34 @@ public class EventController {
 		//バリデーションエラーがない場合に更新処理を行う
 		if(this.mngUtil.getErrorResult(ret, result)== true)
 		{
-			this.service.updateEvent(target);
+			ModelEvent item = this.service.updateEvent(target);
+			
+			ret.setModelResult(item);
 		}
+		
+		//レスポンス情報を作成
+		HttpHeaders responseHeaders = new HttpHeaders();
+		ResponseEntity<String> response = new ResponseEntity<String>(this.mngJson.ConvertObjectToJson(ret),
+				responseHeaders, HttpStatus.OK);
+		
+		return response;
+	}
+	
+
+	/**
+	 * イベントデータの削除を行う。
+	 * 
+	 * @param target
+	 * @return
+	 * @throws Exception
+	 */
+	@PostMapping("/deleteEvent")
+	ResponseEntity<String> deleteEvent(@RequestBody ModelRequestDelete target) throws Exception {
+
+		// 戻り値を作成
+		ModelJsonResult ret = new ModelJsonResult();
+
+		this.service.deleteEvent(target);
 		
 		//レスポンス情報を作成
 		HttpHeaders responseHeaders = new HttpHeaders();

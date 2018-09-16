@@ -38,34 +38,61 @@ export class HttpAccessService {
                 funcSubs(response);
 
                 },
-                error => console.log("Error: " + error)
+                error => {
+                    console.log("Error: " + error);
+                    throw new ApplicationError('http connect err');
+                }
             );
  
     }
 
-    
-  protected getPostResult(response)
-  {
-//    this.isValid = true;
-    switch(response.status)
+    public postApp(funcSubs,body:any,url:string)
     {
-      //成功
-      case 1:
-        return response.modelResult;
-      //バリデーションエラー
-      case 2:
-        // this.isValid = false;
-        // this.valid = response.modelResult;
-        break;
-      //未ログイン
-      case 9:
-        throw new UnloginAccessError('unlogin');
-        
-      //異常終了
-      case 99:
-        throw new ApplicationError('managed server err');
-      default:
-        break;
+     
+        if(this.http == null)
+        {
+            this.http = this.injector.get(HttpClient);
+        }
+
+        this.http.post//<ModelEvent[]>
+            (environment.parentPath + url + environment.endPath 
+                ,body,this.httpOptions)
+            .subscribe(
+                response => {
+                console.debug(response.body);
+
+                funcSubs(response);
+
+                },
+                error => {
+                    console.log("Error: " + error);
+                }
+            );
+ 
     }
-  }
+    
+    protected getPostResult(response)
+    {
+    //    this.isValid = true;
+        switch(response.status)
+        {
+        //成功
+        case 1:
+            return response.modelResult;
+        //バリデーションエラー
+        case 2:
+            // this.isValid = false;
+            // this.valid = response.modelResult;
+            break;
+        //未ログイン
+        case 9:
+            throw new UnloginAccessError('unlogin');
+            
+        //異常終了
+        case 99:
+            throw new ApplicationError('managed server err');
+        default:
+            break;
+        }
+    }
 }

@@ -11,9 +11,9 @@ public class ModelUser
 	 */
 	private static final long serialVersionUID = 3564805125571984737L;
 	
-	public int userId;
-	public String userName;
-	public String password;
+	private int userId;
+	private String userName;
+	private String password;
 	
 	public int getUserId() {
 		return userId;

@@ -11,8 +11,6 @@ import sample.web.common.logic.ManageSession;
 
 public class ModelTableCommon {
 
-	@Autowired
-	ManageSession session;
 	
 	public static final String ITEM_DEFINE = ",ssCreateDate,ssCreatePrg,ssUpdateDate,ssUpdatePrg,ssVersion";
 
@@ -24,11 +22,12 @@ public class ModelTableCommon {
 	private Date ssUpdateDate;
 	private String ssUpdatePrg;
 	private int ssVersion;
+	private int ssIsDelete;
 
 	public int getUserId() {
 		return userId;
 	}
-	public void setUserId(int useId) {
+	public void setUserId(int userId) {
 		this.userId = userId;
 	}
 	public Date getSsCreateDate() {
@@ -62,32 +61,10 @@ public class ModelTableCommon {
 		this.ssVersion = ssVersion;
 	}
 
-	public void setCreateInfo() throws JsonProcessingException
-	{
-		ModelActionInfo info = this.session.getNever(CommonConst.SystemSession.ActionInfo, ModelActionInfo.class);
-		
-		this.setCreateInfo(info.getActionName());
+	public int getSsIsDelete() {
+		return ssIsDelete;
 	}
-	public void setCreateInfo(String prgName)
-	{
-		this.setSsCreateDate(new Date());
-		this.setSsCreatePrg(prgName);
-		this.setSsUpdateDate(new Date());
-		this.setSsUpdatePrg(prgName);
-		this.setSsVersion(1);
-	}
-
-	public void setUpdateInfo() throws JsonProcessingException 
-	{
-		ModelActionInfo info = this.session.getNever(CommonConst.SystemSession.ActionInfo, ModelActionInfo.class);
-
-		this.setUpdateInfo(info.getActionName());
-	}
-	public void setUpdateInfo(String prgName) 
-	{
-		this.setUserId(1);
-		this.setSsUpdateDate(new Date());
-		this.setSsUpdatePrg(prgName);
-		this.setSsVersion(this.ssVersion + 1);
+	public void setSsIsDelete(int ssIsDelete) {
+		this.ssIsDelete = ssIsDelete;
 	}
 }

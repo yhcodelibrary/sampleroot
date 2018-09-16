@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -24,11 +26,12 @@ public class ModelEvent
 	private String type;
 	@NotBlank()
 	private String category;
+	@Size(min=0,max=7)
+	@Pattern(regexp = "^\\d*$")
 	private String amount;
 	private String detail;
 	private String note;
-//	@NotBlank()
-	@NotNull
+	@NotNull()
 	private Date eventDate;
 	public int getEventId() {
 		return eventId;

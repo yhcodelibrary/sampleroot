@@ -20,7 +20,7 @@ public class MyCorsPreflightConfiguration {
         config.addAllowedHeader(CorsConfiguration.ALL);
         config.addAllowedMethod(CorsConfiguration.ALL); // 細かく設定可
         //source.registerCorsConfiguration("/oauth/token", config); // OAuth EP
-        source.registerCorsConfiguration("/api/account/**", config); // 個別設定
+ //       source.registerCorsConfiguration("/api/account/**", config); // 個別設定
         source.registerCorsConfiguration("/api/**", config); // 個別設定
         FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
 

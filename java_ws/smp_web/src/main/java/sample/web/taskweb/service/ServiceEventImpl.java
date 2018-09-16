@@ -3,16 +3,20 @@ package sample.web.taskweb.service;
 import java.util.Date;
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import sample.web.common.define.CommonConst;
 import sample.web.common.define.OptimisticLockException;
+import sample.web.common.logic.ManageSession;
 import sample.web.common.logic.ManageUtil;
+import sample.web.common.model.ModelUser;
 import sample.web.taskweb.dao.DaoEvent;
 import sample.web.taskweb.model.ModelEvent;
 import sample.web.taskweb.model.ModelEventSummary;
+import sample.web.taskweb.model.ModelRequestDelete;
 
 @Service
 public class ServiceEventImpl implements ServiceEvent {
@@ -24,8 +28,10 @@ public class ServiceEventImpl implements ServiceEvent {
 	private DaoEvent daoEvent;
 	
 	@Autowired
-	HttpSession session;  
-	
+	ManageSession session;  
+
+	@Autowired
+	ManageUtil utl;  
 	
 	public List<ModelEvent> getMonthList(int year,int month) {
 
@@ -49,15 +55,46 @@ public class ServiceEventImpl implements ServiceEvent {
 		return this.daoEvent.selectSummary(type, from, to);
 	}
 	
-	public void createEvent(ModelEvent target) {
+	public ModelEvent createEvent(ModelEvent target) throws JsonProcessingException {
 
+		utl.setCreateInfo(target);
+
+		ModelUser user = this.session.getNever(CommonConst.SystemSession.LoginInfo,ModelUser.class);	
+		
+		target.setUserId(user.getUserId());
+		
 		this.daoEvent.createEvent(target);
+
+		//更新後のデータを取得
+		return this.daoEvent.selectModelEvent(target.getEventId());
 	}
 	
-	public void updateEvent(ModelEvent target) throws OptimisticLockException {
+	public ModelEvent updateEvent(ModelEvent target) throws OptimisticLockException, JsonProcessingException {
 
-		//target.setUpdateInfo();
+		utl.setUpdateInfo(target);
+
+		ModelUser user = this.session.getNever(CommonConst.SystemSession.LoginInfo,ModelUser.class);	
+		
+		target.setUserId(user.getUserId());
 		
 		int count = this.daoEvent.updateEvent(target);
+		
+		//更新後のデータを取得
+		return this.daoEvent.selectModelEvent(target.getEventId());
+	}
+
+	
+	public void deleteEvent(ModelRequestDelete target) throws OptimisticLockException, JsonProcessingException {
+
+		ModelEvent input = new ModelEvent();
+		
+		ModelUser user = this.session.getNever(CommonConst.SystemSession.LoginInfo,ModelUser.class);	
+		
+		input.setEventId(target.getEventId());
+		input.setUserId(user.getUserId());
+		input.setSsVersion(target.getSsVersion());
+		
+		int count = this.daoEvent.updateDeleteEvent(input);
+		
 	}
 }

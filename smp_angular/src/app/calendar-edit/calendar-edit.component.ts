@@ -42,8 +42,6 @@ export class CalendarEditComponent extends ModalPageBase{
   }
 
   onInitLoad(){
-    // this.types = ManageMaster.getTypes(this.http);
-    // this.categories = ManageMaster.getCategories(this.editTarget.type,this.http);
     this.types = this.masterValueService.getTypes();
     this.categories = this.masterValueService.getCategories(this.editTarget.type);
     
@@ -68,21 +66,21 @@ export class CalendarEditComponent extends ModalPageBase{
     let result : ModelEvent = null;
 
     if(this.editInfo.editMode === 1){
-      this.ExePostEvent(environment.parentPath + 'api/event/createEvent' + environment.endPath);
+      this.ExePostEvent('api/event/createEvent');
     }
     else
     {
-      this.ExePostEvent(environment.parentPath + 'api/event/updateEvent' + environment.endPath);
+      this.ExePostEvent('api/event/updateEvent');
     }
     //this.activeModal.close(result);
-  }
+  } 
 
   private ExePostEvent(url:string)
   {
-    const body =
-      {
-        target:this.editTarget.requestObject(),
-      };
+    const body =this.editTarget.requestObject();
+      // {
+      //   target:this.editTarget.requestObject(),
+      // };
       
     const self = this;
 
@@ -94,15 +92,17 @@ export class CalendarEditComponent extends ModalPageBase{
       if(self.isValid)
       {
         let target:ModelEvent = ModelEvent.create(result);
-        self.targetMouthEvents[target.eventId] = target;
-        self.close();
+        //self.targetMouthEvents[target.eventId] = target;
+        self.close(target);
       }
 
     });
+
+    this.httpAccess.postAuthApp(func,body,url);
   }
   
   onClickCancel(){
-    this.close();
+    this.close(null);
   }
 
   onChangeType()

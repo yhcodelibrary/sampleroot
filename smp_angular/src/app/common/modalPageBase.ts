@@ -6,15 +6,15 @@ import { Router } from "@angular/router";
 
 export class ModalPageBase extends PageBase {
     
-  constructor(protected activeModal: NgbActiveModal
+  constructor(public activeModal: NgbActiveModal
     ,router: Router)
   {
     super(router);
   }
 
-  public close()
+  public close(item)
   {
-    this.activeModal.close(null);
+    this.activeModal.close(item);
   }
 
   protected signout()

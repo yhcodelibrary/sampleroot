@@ -9,8 +9,8 @@ import { ApplicationError } from '../common-ts/applicationError';
 
 export class BasicPageBase implements OnInit ,OnDestroy {
   
-  protected isValid:boolean;
-  protected valid:ModelValidation;
+  public isValid:boolean;
+  public valid:ModelValidation;
   
   ngOnInit()
   {
@@ -67,13 +67,13 @@ export class BasicPageBase implements OnInit ,OnDestroy {
     }
   }
 
-  protected getKeys(map){
+  public getKeys(map){
     let arr =Array.from(map.keys());
     arr.unshift("");
     return arr;
   }
 
-  protected isValidError(item:string):boolean
+  public isValidError(item:string):boolean
   {
     if(this.valid.codes.indexOf(item) > -1)
     {

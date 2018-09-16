@@ -13,9 +13,7 @@ import { trigger, state, transition, style, animate } from '@angular/animations'
 //定義型読み込み
 import {PageBase} from '../common/pageBase';
 
-import { ManageUtil } from '../manage/magangeUtil';
 import { ManageValue } from '../manage/manageValue';
-import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
 import { SharedValueService } from '../service/sharedValue.service'
 import { Subscription, Observable } from 'rxjs';
@@ -51,7 +49,6 @@ export class CalendarComponent extends PageBase  {
   monthEvents:Array<ModelEvent>[];
   monthEventDisp:boolean[];
 
-  //targetMouthEvents:ModelEvent[];
   get targetMouthEvents():ModelEvent[]
   {
     return ManageValue.getValue<ModelEvent[]>("targetMouthEvents");
@@ -64,7 +61,7 @@ export class CalendarComponent extends PageBase  {
 
   targetEvent:ModelEvent;
 
-  selectedDate:Date;
+  selectedDate:Date = null;
   
   targetYear:number;
   targetMouth:number;
@@ -81,10 +78,14 @@ export class CalendarComponent extends PageBase  {
   private subscription: Subscription;
 
   /**
-   * コンストラクタ. 
-   *
+   * Creates an instance of CalendarComponent.
+   * @param {ChangeDetectorRef} chRef
+   * @param {NgbModal} modalService
    * @param {SharedValueService} sharedValueService 共通値サービス
-   * @memberof AppComponent
+   * @param {HttpAccessService} httpAccess
+   * @param {MasterValueService} masterValueService
+   * @param {Router} router
+   * @memberof CalendarComponent
    */
   constructor(private chRef: ChangeDetectorRef
     ,private modalService: NgbModal
@@ -107,6 +108,11 @@ export class CalendarComponent extends PageBase  {
     this.subscription.unsubscribe();
   }
 
+  /**
+   * 初期処理
+   *
+   * @memberof CalendarComponent
+   */
   onInitLoad(){
 
     var today = new Date();
@@ -131,16 +137,28 @@ export class CalendarComponent extends PageBase  {
     this.chRef.detectChanges();
   }
 
-  //追加登録ボタン押下
+  /**
+   * 追加登録ボタン押下
+   *
+   * @memberof CalendarComponent
+   */
   onClickRegisterOpen()
   {
     const ei = new EditInfo();
     ei.editMode = 1;
     
-    this.openModal(new ModelEvent(),ei);
+    let ev:ModelEvent = new ModelEvent();
+    ev.eventDate = this.selectedDate;
+
+    this.openModal(ev,ei);
   }
 
-  //変更ボタン押下
+  /**
+   * 変更ボタン押下
+   *
+   * @param {ModelEvent} model
+   * @memberof CalendarComponent
+   */
   onClickEditOpen(model:ModelEvent):void
   {
     let ei = new EditInfo();
@@ -153,17 +171,24 @@ export class CalendarComponent extends PageBase  {
     const modalRef = this.modalService.open(CalendarEditComponent);
     modalRef.componentInstance.editTarget = model.clone();
     modalRef.componentInstance.editInfo = ei;
-    modalRef.componentInstance.targetMouthEvents = this.targetMouthEvents;
 
     let ret;
+    let self = this;
     
     modalRef.result.then(
       result => {
         // on close
         ret = result;// 戻り値
-        // if(result !== null){
-        //   this.targetMouthEvents[result.id].reflect(result);
-        // }
+        if(result !== null){
+          if(self.targetMouthEvents[result.eventId]){
+            self.targetMouthEvents[result.eventId].reflect(result);
+          }
+          else{
+            self.setEvent(result); 
+          }
+          
+          self.onClickDate(self.selectedDate);
+        }
       }
       , (reason) => {
         // on dismiss
@@ -177,16 +202,32 @@ export class CalendarComponent extends PageBase  {
         return ret;
       }
     );
-    
-    // modalRef.close = (result) => {
-    //   let test = 1;
-    // };
-    // modalRef.dismiss = (reason) => {
-    //   let test = 1;
-    // };
   }
 
-  //年月日の変更イベント
+  onClickDelete(ev:ModelEvent){
+
+    let body = ev;
+
+    let self = this;
+        
+    const func=(function(response){
+      
+      let result = self.getPostResult(response.body);
+      self.removeEvent(ev);
+      self.onClickDate(self.selectedDate);
+    });
+    
+    this.httpAccess.postAuthApp(func,body,'api/event/deleteEvent');
+  }
+
+  /**
+   * 年月日の変更イベント
+   *
+   * @param {number} year
+   * @param {number} month
+   * @param {number} monthDiff
+   * @memberof CalendarComponent
+   */
   onClickChangeMonth(year:number,month:number,monthDiff:number){
   
     month = month + monthDiff;
@@ -233,13 +274,51 @@ export class CalendarComponent extends PageBase  {
     return name;
   }
 
-  //反映イベント
+  /**
+   * 反映イベント
+   *
+   * @param {ModelEvent} model
+   * @memberof CalendarComponent
+   */
   reflectEvent(model:ModelEvent)
   {
     this.targetMouthEvents[model.eventId] = model;
   }
 
-  //カレンダー作成
+  removeEvent(tmp:ModelEvent)
+  {
+
+    this.targetMouthEvents = this.targetMouthEvents.filter(n => n.eventId !== tmp.eventId);
+    let evekey = tmp.eventDate.getMonth()*100 + tmp.eventDate.getDate();
+    this.monthEvents[evekey] = this.monthEvents[evekey].filter(n => n.eventId !== tmp.eventId);
+  }
+
+  setEvent(tmp:ModelEvent)
+  {
+
+    this.targetMouthEvents[tmp.eventId] = tmp;
+    let evekey = tmp.eventDate.getMonth()*100 + tmp.eventDate.getDate();
+    if(this.monthEvents[evekey] == undefined)
+    {
+      this.monthEvents[evekey] = new Array<ModelEvent>();
+    }
+    if(this.monthEvents[evekey].length >= 2)
+    {
+      this.monthEventDisp[evekey] = true;
+    }
+    else
+    {
+      this.monthEvents[evekey].push(tmp);
+    }
+  }
+
+  /**
+   * カレンダー作成
+   *
+   * @param {number} targetY
+   * @param {number} targetM
+   * @memberof CalendarComponent
+   */
   createCalendar(targetY:number,targetM:number){
     
 
@@ -266,22 +345,9 @@ export class CalendarComponent extends PageBase  {
       let result = self.getPostResult(response.body);
 
       for(let i = 0; i < result.length; i++) {
-        let tmp = ModelEvent.create(result[i]);
+        let tmp:ModelEvent = ModelEvent.create(result[i]);
         //イベントIDをキーにマップに登録する
-        self.targetMouthEvents[tmp.eventId] = tmp;
-        let evekey = tmp.eventDate.getMonth()*100 +tmp.eventDate.getDate();
-        if(self.monthEvents[evekey] == undefined)
-        {
-          self.monthEvents[evekey] = new Array<ModelEvent>();
-        }
-        if(self.monthEvents[evekey].length >= 2)
-        {
-          self.monthEventDisp[evekey] = true;
-        }
-        else
-        {
-          self.monthEvents[evekey].push(tmp);
-        }
+        self.setEvent(tmp);
       }
       
       self.sharedValueService.onSharedDataChanged('pageupd','after');

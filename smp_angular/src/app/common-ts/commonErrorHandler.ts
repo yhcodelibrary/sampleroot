@@ -4,7 +4,7 @@ import { UnloginAccessError } from './UnloginAccessError';
 import { ApplicationError } from './applicationError';
 
 @Injectable()
-export default class CommonErrorHandler extends  ErrorHandler {
+export  class CommonErrorHandler extends  ErrorHandler {
     
     private router;
     injector: Injector;
@@ -28,7 +28,7 @@ export default class CommonErrorHandler extends  ErrorHandler {
 
         if(error instanceof UnloginAccessError)
         {
-            // this.router.navigate(['/logout']);
+            this.router.navigate(['/logout']);
             // location.reload();
             return;
         }

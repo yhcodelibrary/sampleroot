@@ -8,6 +8,7 @@ import { MasterValueService } from '../service/masterValue.service';
 import { trigger, state, transition, style, animate } from '@angular/animations';
 import { Subscription, Observable } from 'rxjs';
 import { SharedValueService } from '../service/sharedValue.service';
+import { ManageUtil } from '../manage/magangeUtil';
 
 declare var $ :any;
 
@@ -93,7 +94,17 @@ export class AllListComponent extends PageBase {
         this.state = msg;
       }
     ));
+    
+    const today = new Date();
+    //対象年月の１日を取得
+    let start = new Date(today.getFullYear(),today.getMonth(),1);
+    //翌月の１日を取得
+    let end = new Date(today.getFullYear(),today.getMonth()+1,1);
 
+    this.fromDate = ManageUtil.convertDateToString(start);
+    this.toDate = ManageUtil.convertDateToString(end);
+
+    this.onClickSearch();
   }
   
   /**
