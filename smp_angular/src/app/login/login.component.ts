@@ -8,6 +8,13 @@ import { HttpAccessService } from '../service/httpAccess.service';
 
 //https://stackoverflow.com/questions/48011849/angular-5-spring-boot-spring-security-login
 
+/**
+ * ログイン画面クラス
+ *
+ * @export
+ * @class LoginComponent
+ * @extends {BasicPageBase}
+ */
 @Component({
     selector: 'login',
     templateUrl: './login.component.html',
@@ -22,6 +29,13 @@ export class LoginComponent extends BasicPageBase{
   password:string;
   sampleCheck:boolean;
 
+  /**
+   *Creates an instance of LoginComponent.
+   * @param {Router} router
+   * @param {HttpAccessService} httpAccess
+   * @param {SharedValueService} sharedValueService
+   * @memberof LoginComponent
+   */
   constructor(
     router:Router,
     private httpAccess:HttpAccessService,
@@ -30,11 +44,21 @@ export class LoginComponent extends BasicPageBase{
     super(router);
   }
 
+  /**
+   * 初期ロード
+   *
+   * @memberof LoginComponent
+   */
   onInitLoad()
   {
     this.sampleCheck = false;
   }
 
+  /**
+   * ログインクリック
+   *
+   * @memberof LoginComponent
+   */
   onClickLogin()
   {
     
@@ -59,36 +83,13 @@ export class LoginComponent extends BasicPageBase{
 
     this.httpAccess.postAuthApp(func,body,'api/account/login');
 
-
-    // this.http.post//<ModelEvent[]>
-    //   (environment.parentPath + 'api/account/login' + environment.endPath 
-    //   ,body,httpOptions)
-    // // subscribeの時点でModelEvent[]として受け取れる
-    // .subscribe(
-    //   response => {
-    //     console.debug(response.body);
-    //     console.debug(response.headers.keys.length);
-    //     for(let tes in response.headers.keys)
-    //     {
-    //       console.debug(tes);
-    //     }
-    //     console.debug(response.headers.get("Set-Cookie"));
-    //     let result = self.getPostResult(response);
-
-    //     console.debug();
-    //     //バリデーションエラーがない場合
-    //     if(self.isValid)
-    //     {
-    //       console.debug('tes2');
-    //       this.sharedValueService.onSharedDataChanged('pageupd','before');
-    //       this.router.navigate(['/calendar']);
-    //     }
-    //   },
-    //   error => console.log("Error: " + error)
-    // );
-
   }
 
+  /**
+   * サンプルユーザーログインの設定
+   *
+   * @memberof LoginComponent
+   */
   onChangeSample()
   {
     if(this.sampleCheck)

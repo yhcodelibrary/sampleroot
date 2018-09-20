@@ -12,6 +12,13 @@ import { ManageUtil } from '../manage/magangeUtil';
 
 declare var $ :any;
 
+/**
+ * 一覧表示コンポーネント
+ *
+ * @export
+ * @class AllListComponent
+ * @extends {PageBase}
+ */
 @Component({
   selector: 'app-all-list',
   templateUrl: './all-list.component.html',
@@ -31,8 +38,28 @@ declare var $ :any;
 })
 export class AllListComponent extends PageBase {
 
+  /**
+   * 発生日From
+   *
+   * @type {string}
+   * @memberof AllListComponent
+   */
   fromDate:string;
+
+  /**
+   * 発生日To
+   *
+   * @type {string}
+   * @memberof AllListComponent
+   */
   toDate:string;
+
+  /**
+   * 表示中のイベント
+   *
+   * @type {MouseEvent[]}
+   * @memberof AllListComponent
+   */
   targetEvents:MouseEvent[] = [];
   state:string = 'before';
   
@@ -45,6 +72,14 @@ export class AllListComponent extends PageBase {
    */
   private subscription: Subscription;
 
+  /**
+   *Creates an instance of AllListComponent.
+   * @param {HttpAccessService} httpAccess
+   * @param {MasterValueService} masterValueService
+   * @param {SharedValueService} sharedValueService
+   * @param {Router} router
+   * @memberof AllListComponent
+   */
   constructor(private httpAccess:HttpAccessService
     ,private masterValueService:MasterValueService
     ,private sharedValueService:SharedValueService
@@ -53,6 +88,11 @@ export class AllListComponent extends PageBase {
     super(router);
   }
 
+  /**
+   * 初期ロードイベント
+   *
+   * @memberof AllListComponent
+   */
   onInitLoad()
   {
 
@@ -62,7 +102,6 @@ export class AllListComponent extends PageBase {
       autoclose: true,
       showButtonPanel: true,
       format: 'yyyy/mm/dd',
-//      setDate: this.editTarget.eventDateString
     }).on({
       changeDate : function() {
         self.fromDate=fpicker.val();
@@ -76,7 +115,6 @@ export class AllListComponent extends PageBase {
       autoclose: true,
       showButtonPanel: true,
       format: 'yyyy/mm/dd',
-//      setDate: this.editTarget.eventDateString
     }).on({
       changeDate : function() {
         self.toDate=tpicker.val();
@@ -117,6 +155,11 @@ export class AllListComponent extends PageBase {
     this.subscription.unsubscribe();
   }
 
+  /**
+   * 検索押下
+   *
+   * @memberof AllListComponent
+   */
   onClickSearch()
   {
     
@@ -152,10 +195,25 @@ export class AllListComponent extends PageBase {
     
   }
 
+  /**
+   * 収支タイプの名称を取得する
+   *
+   * @param {ModelEvent} model
+   * @returns
+   * @memberof AllListComponent
+   */
   getTypeName(model:ModelEvent)
   {
     return this.masterValueService.getTypes().get(model.type);
   }
+  
+  /**
+   * 種別の名称を取得する
+   *
+   * @param {ModelEvent} model
+   * @returns
+   * @memberof AllListComponent
+   */
   getCategoryName(model:ModelEvent)
   {
     const name = this.masterValueService.getCategories(model.type).get(model.category);

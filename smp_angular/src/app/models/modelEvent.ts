@@ -1,8 +1,13 @@
 
 //定義型読み込み
 import { ManageUtil } from '../manage/magangeUtil';
-import { ManageMaster } from '../manage/manageMaster';
 
+/**
+ * イベント情報モデル
+ *
+ * @export
+ * @class ModelEvent
+ */
 export class ModelEvent {
     eventId:number;
     type:string;

@@ -1,18 +1,27 @@
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ModelValidation } from '../models/modelValidation';
-import { ManageMaster } from '../manage/manageMaster';
 
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { OnInit } from '@angular/core';
 import { BasicPageBase } from './basicPageBase';
 
-import { environment } from '../../environments/environment';
-
+/**
+ * 通常ページ基底クラス
+ *
+ * @export
+ * @class PageBase
+ * @extends {BasicPageBase}
+ */
 export class PageBase extends BasicPageBase {
-  
 
-  
+  /**
+   *Creates an instance of PageBase.
+   * @param {Router} router
+   * @memberof PageBase
+   */
+  constructor(router: Router)
+  {
+    super(router);
+  }
+
+　//ToDo削除予定
   ngOnInit()
   {
     this.isValid = true;
@@ -24,11 +33,5 @@ export class PageBase extends BasicPageBase {
   onInitStart(){}
   onInitLoad(){}
   onInitEnd(){}
-
-  constructor(router: Router)
-  {
-    super(router);
-  }
-
   
 }

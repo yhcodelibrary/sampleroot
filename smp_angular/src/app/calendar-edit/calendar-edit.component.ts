@@ -4,12 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import { ModelEvent } from '../models/modelEvent';
 import { EditInfo } from '../models/editInfo';
-import { ManageMaster } from '../manage/manageMaster';
 
-//定義型読み込み
-import {ImportanceType} from '../common/enumDefine';
-
-import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
 import { ModalPageBase } from '../common/modalPageBase';
 import { MasterValueService } from '../service/masterValue.service';
@@ -18,20 +13,63 @@ declare var jquery:any;
 declare var $ :any;
 
 
+/**
+ * イベント編集コンポーネント
+ *
+ * @export
+ * @class CalendarEditComponent
+ * @extends {ModalPageBase}
+ */
 @Component({
   selector: 'app-calendar-edit',
   templateUrl: './calendar-edit.component.html',
   styleUrls: ['./calendar-edit.component.css']
 })
 export class CalendarEditComponent extends ModalPageBase{
+  /**
+   * 更新イベント情報
+   *
+   * @type {ModelEvent}
+   * @memberof CalendarEditComponent
+   */
   @Input() editTarget:ModelEvent;
+
+  /**
+   * 編集情報モデル
+   *
+   * @type {EditInfo}
+   * @memberof CalendarEditComponent
+   */
   @Input() editInfo:EditInfo;
   
+  //Todo 削除予定
   targetMouthEvents:ModelEvent[];
   
+  /**
+   * 表示中の収支タイプ
+   *
+   * @type {Map<string,string>}
+   * @memberof CalendarEditComponent
+   */
   types:Map<string,string>;
+
+  /**
+   * 表示中のしゅべつ
+   *
+   * @type {Map<string,string>}
+   * @memberof CalendarEditComponent
+   */
   categories:Map<string,string>;
 
+  /**
+   *Creates an instance of CalendarEditComponent.
+   * @param {NgbActiveModal} activeModal
+   * @param {HttpClient} http
+   * @param {MasterValueService} masterValueService
+   * @param {HttpAccessService} httpAccess
+   * @param {Router} router
+   * @memberof CalendarEditComponent
+   */
   constructor(activeModal: NgbActiveModal
     ,http: HttpClient
     ,private masterValueService:MasterValueService
@@ -41,6 +79,11 @@ export class CalendarEditComponent extends ModalPageBase{
     super(activeModal,router);
   }
 
+  /**
+   * 初期ロード
+   *
+   * @memberof CalendarEditComponent
+   */
   onInitLoad(){
     this.types = this.masterValueService.getTypes();
     this.categories = this.masterValueService.getCategories(this.editTarget.type);
@@ -51,7 +94,6 @@ export class CalendarEditComponent extends ModalPageBase{
       autoclose: true,
       showButtonPanel: true,
       format: 'yyyy/mm/dd',
-//      setDate: this.editTarget.eventDateString
     }).on({
       changeDate : function() {
         self.editTarget.eventDateString=picker.val();
@@ -61,6 +103,11 @@ export class CalendarEditComponent extends ModalPageBase{
     picker.datepicker("setDate",this.editTarget.eventDateString);
   }
 
+  /**
+   * 登録ボタン押下
+   *
+   * @memberof CalendarEditComponent
+   */
   onClickRegister(){
 
     let result : ModelEvent = null;
@@ -72,15 +119,18 @@ export class CalendarEditComponent extends ModalPageBase{
     {
       this.ExePostEvent('api/event/updateEvent');
     }
-    //this.activeModal.close(result);
   } 
 
+  /**
+   * 登録、更新イベント共通
+   *
+   * @private
+   * @param {string} url
+   * @memberof CalendarEditComponent
+   */
   private ExePostEvent(url:string)
   {
     const body =this.editTarget.requestObject();
-      // {
-      //   target:this.editTarget.requestObject(),
-      // };
       
     const self = this;
 
@@ -92,7 +142,6 @@ export class CalendarEditComponent extends ModalPageBase{
       if(self.isValid)
       {
         let target:ModelEvent = ModelEvent.create(result);
-        //self.targetMouthEvents[target.eventId] = target;
         self.close(target);
       }
 
@@ -101,10 +150,20 @@ export class CalendarEditComponent extends ModalPageBase{
     this.httpAccess.postAuthApp(func,body,url);
   }
   
+  /**
+   * キャンセルクリック
+   *
+   * @memberof CalendarEditComponent
+   */
   onClickCancel(){
     this.close(null);
   }
 
+  /**
+   * 収支タイプ変更時イベント
+   *
+   * @memberof CalendarEditComponent
+   */
   onChangeType()
   {
     this.categories = this.masterValueService.getCategories(this.editTarget.type);

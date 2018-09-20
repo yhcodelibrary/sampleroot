@@ -7,11 +7,24 @@ import { UnloginAccessError } from '../common-ts/UnloginAccessError';
 import { ApplicationError } from '../common-ts/applicationError';
 
 
+/**
+ * ページ基盤クラス基礎
+ *
+ * @export
+ * @class BasicPageBase
+ * @implements {OnInit}
+ * @implements {OnDestroy}
+ */
 export class BasicPageBase implements OnInit ,OnDestroy {
   
   public isValid:boolean;
   public valid:ModelValidation;
   
+  /**
+   * 初期処理
+   *
+   * @memberof BasicPageBase
+   */
   ngOnInit()
   {
     this.isValid = true;
@@ -24,6 +37,11 @@ export class BasicPageBase implements OnInit ,OnDestroy {
   onInitLoad(){}
   onInitEnd(){}
 
+  /**
+   * 破棄処理
+   *
+   * @memberof BasicPageBase
+   */
   ngOnDestroy()
   {
     this.onDestroyStart();
@@ -41,6 +59,14 @@ export class BasicPageBase implements OnInit ,OnDestroy {
     this.valid = new ModelValidation();
   }
 
+  /**
+   * ポストデータ処理の共通
+   *
+   * @protected
+   * @param {*} response
+   * @returns
+   * @memberof BasicPageBase
+   */
   protected getPostResult(response)
   {
     this.isValid = true;
@@ -67,12 +93,26 @@ export class BasicPageBase implements OnInit ,OnDestroy {
     }
   }
 
+  /**
+   * 対象マップからキー情報の配列を取り出す
+   *
+   * @param {*} map
+   * @returns
+   * @memberof BasicPageBase
+   */
   public getKeys(map){
     let arr =Array.from(map.keys());
     arr.unshift("");
     return arr;
   }
 
+  /**
+   * バリデーションエラー判定共通
+   *
+   * @param {string} item
+   * @returns {boolean}
+   * @memberof BasicPageBase
+   */
   public isValidError(item:string):boolean
   {
     if(this.valid.codes.indexOf(item) > -1)
@@ -83,6 +123,12 @@ export class BasicPageBase implements OnInit ,OnDestroy {
     return false;
   }
 
+  /**
+   * サインアウト
+   *
+   * @protected
+   * @memberof BasicPageBase
+   */
   protected signout()
   {
     this.router.navigate(["/logout"]);

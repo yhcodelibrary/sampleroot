@@ -1,4 +1,4 @@
-
+    //ToDo　削除予定
     export enum ImportanceType
     {
         Normal = 1,

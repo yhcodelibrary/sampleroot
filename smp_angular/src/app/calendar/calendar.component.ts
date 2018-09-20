@@ -1,10 +1,8 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Component ,ChangeDetectorRef} from '@angular/core';
 import { NgbModal ,ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { CalendarEditComponent} from '../calendar-edit/calendar-edit.component';
-//Todo.tsを読み込む
 import { ModelEvent } from '../models/modelEvent';
 import { EditInfo } from '../models/editInfo';
 
@@ -20,6 +18,13 @@ import { Subscription, Observable } from 'rxjs';
 import { HttpAccessService } from '../service/httpAccess.service';
 import { MasterValueService } from '../service/masterValue.service';
 
+/**
+ * カレンダー表示コンポーネント
+ *
+ * @export
+ * @class CalendarComponent
+ * @extends {PageBase}
+ */
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
@@ -57,15 +62,53 @@ export class CalendarComponent extends PageBase  {
   {
     ManageValue.setValue<ModelEvent[]>("targetMouthEvents",value);
   }
+
+  /**
+   * 選択中日付のイベント配列
+   *
+   * @type {ModelEvent[]}
+   * @memberof CalendarComponent
+   */
   targetDayEvents:ModelEvent[];
 
+  /**
+   *
+   *
+   * @type {ModelEvent}
+   * @memberof CalendarComponent
+   */
   targetEvent:ModelEvent;
 
+  /**
+   * 選択中日付
+   *
+   * @type {Date}
+   * @memberof CalendarComponent
+   */
   selectedDate:Date = null;
   
+  /**
+   * 表示年
+   *
+   * @type {number}
+   * @memberof CalendarComponent
+   */
   targetYear:number;
+
+  /**
+   * 表示月
+   *
+   * @type {number}
+   * @memberof CalendarComponent
+   */
   targetMouth:number;
 
+  /**
+   * 本日表示制御イベント
+   *
+   * @type {string}
+   * @memberof CalendarComponent
+   */
   todayState:string = 'before';
 
   /**
@@ -132,6 +175,12 @@ export class CalendarComponent extends PageBase  {
 
   }
   
+  /**
+   *
+   *
+   * @param {ModelEvent} event
+   * @memberof CalendarComponent
+   */
   onClickEvent(event:ModelEvent){
     this.targetEvent = event;
     this.chRef.detectChanges();
@@ -166,6 +215,15 @@ export class CalendarComponent extends PageBase  {
     
     this.openModal(model.clone(),ei);
   }
+
+  /**
+   * 登録更新モーダル共通イベント
+   *
+   * @private
+   * @param {ModelEvent} model
+   * @param {EditInfo} ei
+   * @memberof CalendarComponent
+   */
   private openModal(model:ModelEvent,ei:EditInfo)
   {
     const modalRef = this.modalService.open(CalendarEditComponent);
@@ -204,6 +262,12 @@ export class CalendarComponent extends PageBase  {
     );
   }
 
+  /**
+   * 削除ボタン押下イベント
+   *
+   * @param {ModelEvent} ev
+   * @memberof CalendarComponent
+   */
   onClickDelete(ev:ModelEvent){
 
     let body = ev;
@@ -246,7 +310,12 @@ export class CalendarComponent extends PageBase  {
     this.createCalendar(year,month);
   }
 
-  //日のクリックイベント
+  /**
+   * 日のクリックイベント
+   *
+   * @param {Date} day
+   * @memberof CalendarComponent
+   */
   onClickDate(day:Date)
   {
     this.sharedValueService.onSharedDataChanged('calupd','before');
@@ -264,10 +333,25 @@ export class CalendarComponent extends PageBase  {
     });
   }
 
+  /**
+   * 収支タイプ名称取得
+   *
+   * @param {ModelEvent} model
+   * @returns
+   * @memberof CalendarComponent
+   */
   getTypeName(model:ModelEvent)
   {
     return this.masterValueService.getTypes().get(model.type);
   }
+
+  /**
+   * 種別名称取得
+   *
+   * @param {ModelEvent} model
+   * @returns
+   * @memberof CalendarComponent
+   */
   getCategoryName(model:ModelEvent)
   {
     const name = this.masterValueService.getCategories(model.type).get(model.category);
@@ -285,6 +369,12 @@ export class CalendarComponent extends PageBase  {
     this.targetMouthEvents[model.eventId] = model;
   }
 
+  /**
+   * イベント削除処理
+   *
+   * @param {ModelEvent} tmp
+   * @memberof CalendarComponent
+   */
   removeEvent(tmp:ModelEvent)
   {
 
@@ -293,6 +383,12 @@ export class CalendarComponent extends PageBase  {
     this.monthEvents[evekey] = this.monthEvents[evekey].filter(n => n.eventId !== tmp.eventId);
   }
 
+  /**
+   * イベント登録処理
+   *
+   * @param {ModelEvent} tmp
+   * @memberof CalendarComponent
+   */
   setEvent(tmp:ModelEvent)
   {
 
@@ -378,7 +474,14 @@ export class CalendarComponent extends PageBase  {
 
   }
 
-  //対象日付から始まる１周間を格納
+  /**
+   * 対象日付から始まる１周間を格納
+   *
+   * @param {Date[]} week
+   * @param {Date} startDay
+   * @returns {Date}
+   * @memberof CalendarComponent
+   */
   setWeekDays(week:Date[],startDay:Date):Date{
 
     for(let i = 0; i < 7; i++){
@@ -389,12 +492,14 @@ export class CalendarComponent extends PageBase  {
     return startDay;
   }
 
-  //対象日付のTodoを取得する
-  getTodoForDate(target:Date){
-    
-  }
-
-  //対象日付に番号分たされた年月日を返す
+  /**
+   * 対象日付に番号分たされた年月日を返す
+   *
+   * @param {Date} target
+   * @param {number} addNumber
+   * @returns {Date}
+   * @memberof CalendarComponent
+   */
   addDate(target:Date,addNumber:number):Date{
 
     var newDate = new Date(target.getFullYear(),target.getMonth(),target.getDate());
@@ -404,6 +509,12 @@ export class CalendarComponent extends PageBase  {
   }
   
   //
+  /**
+   * 対象日と一致する発生日のイベントを取得する
+   *
+   * @param {Date} target
+   * @memberof CalendarComponent
+   */
   setDayEvents(target:Date)
   {
     this.targetDayEvents = new Array();
@@ -421,8 +532,15 @@ export class CalendarComponent extends PageBase  {
     }
   }
 
-  //対象日のイベントを取得する
-  //指定数-1まで取得したらやめる
+  /**
+   * 対象日のイベントを取得する
+   * 指定数-1まで取得したらやめる 
+   *
+   * @param {Date} target
+   * @param {number} [num=256]
+   * @returns {ModelEvent[]}
+   * @memberof CalendarComponent
+   */
   getDayEvent(target:Date,num:number = 256):ModelEvent[]{
 
     let ret = new Array();
@@ -448,7 +566,12 @@ export class CalendarComponent extends PageBase  {
     return ret;
   }
 
-  //現在イベントを保持しているかどうか。
+  /**
+   * 発生日のイベントを保持しているかどうか
+   *
+   * @returns {boolean}
+   * @memberof CalendarComponent
+   */
   has_event():boolean
   {
     if(this.targetDayEvents !== null && this.targetDayEvents !== undefined
@@ -459,7 +582,13 @@ export class CalendarComponent extends PageBase  {
     return false;
   }
 
-  //土曜かどうか
+  /**
+   * 土曜かどうか
+   *
+   * @param {Date} target
+   * @returns {boolean}
+   * @memberof CalendarComponent
+   */
   is_saturday(target:Date):boolean{
 
     //対象の曜日を取得
@@ -467,8 +596,14 @@ export class CalendarComponent extends PageBase  {
 
     return dayNumber === 6;
   }
-
-  //日曜かどうか
+  
+  /**
+   * 日曜かどうか
+   *
+   * @param {Date} target
+   * @returns {boolean}
+   * @memberof CalendarComponent
+   */
   is_sunday(target:Date):boolean{
     
     //対象の曜日を取得
@@ -477,7 +612,13 @@ export class CalendarComponent extends PageBase  {
     return dayNumber === 0;
   }
 
-  //祝日かどうか
+  /**
+   * 祝日かどうか
+   *
+   * @param {Date} target
+   * @returns {boolean}
+   * @memberof CalendarComponent
+   */
   is_holiday(target:Date):boolean{
     
     //対象の曜日を取得
@@ -485,6 +626,14 @@ export class CalendarComponent extends PageBase  {
     
     return dayNumber === 0;
   }
+
+  /**
+   * 対象日が選択されたかどうかを判定する
+   *
+   * @param {Date} target
+   * @returns {boolean}
+   * @memberof CalendarComponent
+   */
   selected_cal(target:Date):boolean
   {
     if(this.selectedDate === null || this.selectedDate === undefined)
@@ -499,7 +648,14 @@ export class CalendarComponent extends PageBase  {
     }
     return false;
   }
-  //カレンダーに出力する要素クラスを出力する
+
+  /**
+   * カレンダーに出力する要素クラスを出力する
+   *
+   * @param {ModelEvent} model
+   * @returns {string}
+   * @memberof CalendarComponent
+   */
   getCalClass(model:ModelEvent):string
   {
       let cls :string;

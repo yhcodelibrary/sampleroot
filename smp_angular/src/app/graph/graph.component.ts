@@ -18,24 +18,30 @@ declare var $ :any;
 })
 export class GraphComponent extends PageBase {
 
+  /**
+   *Creates an instance of GraphComponent.
+   * @param {HttpAccessService} httpAccess
+   * @param {Router} router
+   * @memberof GraphComponent
+   */
   constructor(private httpAccess:HttpAccessService,
     router:Router) 
   { 
     super(router);
   }
 
-  //@ViewChild(BaseChartDirective)
-  //@ViewChild('doughChart')
-  //private doughChart: BaseChartDirective; 
-
   @ViewChild(BaseChartDirective)
-  //@ViewChild('barChart')
   private chart: BaseChartDirective; 
 
   type:string;
   fromDate:string;
   toDate:string;
 
+  /**
+   * 初期ロードイベント
+   *
+   * @memberof GraphComponent
+   */
   onInitLoad()
   {
     this.type = "302";
@@ -100,6 +106,11 @@ export class GraphComponent extends PageBase {
     console.log(e);
   }
 
+  /**
+   * 検索ボタン押下
+   *
+   * @memberof GraphComponent
+   */
   onClickSearch()
   {
     
@@ -120,17 +131,20 @@ export class GraphComponent extends PageBase {
         
         self.doughnutChartData = [];
 
+        //チャートのラベル情報をすべて削除
         while(self.chart.chart.data.labels.length > 0)
         {
           self.chart.chart.data.labels.pop();
         }
 
+        //チャートのラベルとデータ情報をすべて追加
         for(let i = 0; i < result.length; i++) {
 
           self.doughnutChartData.push(result[i].amount);
           self.chart.chart.data.labels.push(result[i].itemText);
         }
         
+        //チャート表示更新
         self.chart.chart.update();
       }
     });

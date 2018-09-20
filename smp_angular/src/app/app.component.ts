@@ -4,13 +4,8 @@ import { trigger, state, transition, style, animate } from '@angular/animations'
 
 import { Subscription } from 'rxjs/Subscription';
 
-import { ManageValue } from './manage/manageValue';
 import { SharedValueService } from './service/sharedValue.service';
-//Todo.tsを読み込む
-//import { Todo } from './todo';
 
-//Todotable.tsを読み込む
-//import { TodotableComponent } from './todotable.component';
 
 @Component({
   //このコンポーネントを他のコンポーネントから呼び出す時の名前

@@ -3,6 +3,13 @@ import { Router } from '@angular/router';
 import { UnloginAccessError } from './UnloginAccessError';
 import { ApplicationError } from './applicationError';
 
+/**
+ * 例外エラー発生時ハンドリングクラス
+ *
+ * @export
+ * @class CommonErrorHandler
+ * @extends {ErrorHandler}
+ */
 @Injectable()
 export  class CommonErrorHandler extends  ErrorHandler {
     
@@ -26,12 +33,14 @@ export  class CommonErrorHandler extends  ErrorHandler {
         console.debug('message：' + error.message);
         console.debug('stack：' + error.stack);
 
+        //未ログイン時
         if(error instanceof UnloginAccessError)
         {
             this.router.navigate(['/logout']);
             // location.reload();
             return;
         }
+        //マネージドエラー
         if(error instanceof ApplicationError)
         {
             this.router.navigate(['/logout']);

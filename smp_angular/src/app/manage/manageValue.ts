@@ -1,4 +1,4 @@
-
+//TODO　共通値管理　削除予定
 export class ManageValue {
 
     public static loading:string = "before";

@@ -5,6 +5,7 @@ import { environment } from '../../environments/environment';
 import { ModelCommonValues } from '../models/modelCommonValues';
 import { ModelJsonResult } from '../models/modelJsonResult';
 
+//Todo 未使用　削除予定
 @Injectable()
 export class ManageMaster {
      

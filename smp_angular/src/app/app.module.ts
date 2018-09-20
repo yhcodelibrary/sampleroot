@@ -35,7 +35,6 @@ import { CalendarEditComponent } from './calendar-edit/calendar-edit.component';
 import { environment } from '../environments/environment';
 import { AllListComponent } from './all-list/all-list.component';
 import { GraphComponent } from './graph/graph.component';
-import { ManageValue } from './manage/manageValue';
 import { SharedValueService } from './service/sharedValue.service';
 import { LogoutComponent } from './logout/logout.component';
 import { Observable,Subscription } from 'rxjs';
