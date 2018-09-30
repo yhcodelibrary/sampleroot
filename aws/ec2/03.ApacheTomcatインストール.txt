@@ -1,0 +1,56 @@
+---参考
+https://weblabo.oscasierra.net/installing-tomcat8-centos7-1/
+https://oscasierra.net/2012/04/tomcat-init-script/
+https://weblabo.oscasierra.net/tomcat-mod-proxy-ajp/
+
+--apache
+ yum -y install httpd
+ 
+----実行ユーザ作成
+useradd -s /sbin/nologin tomcat
+
+
+--ダウンロード
+cd ~
+curl -O http://www-eu.apache.org/dist/tomcat/tomcat-8/v8.5.34/bin/apache-tomcat-8.5.34.tar.gz
+
+
+---解凍と配置
+
+tar -xzvf apache-tomcat-8 xxx
+mv apache-tomcat-8.0.50 /opt
+
+
+--サービスの作成と登録
+以下にtomcatを作成
+/etc/rc.d/init.d/
+
+以下を配置
+/etc/profile.d/tomcat.sh 
+
+chmod +x /etc/rc.d/init.d/tomcat
+起動
+/opt/apache-tomcat-8.5.34/bin/startup.sh
+/usr/sbin/apachectl start
+
+
+停止
+/usr/sbin/apachectl stop
+/opt/apache-tomcat-8.5.34/bin/shutdown.sh
+
+/opt/apache-tomcat-8.5.34/bin/startup.sh
+/usr/sbin/apachectl start
+
+--httpd.confに追記
+ProxyPass / ajp://localhost:8009/
+
+
+--tomcat server.xmlからHTTP8080をコメントアウト
+
+
+rm -rf ROOT.war
+rm -rf ROOT
+
+mv /home/ec2-user/ROOT.war .
+cp /home/ec2-user/dist/* ROOT/
+

@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { SharedValueService } from './service/sharedValue.service';
 
+declare var $ :any;
 
 @Component({
   //このコンポーネントを他のコンポーネントから呼び出す時の名前
@@ -110,7 +111,7 @@ export class AppComponent implements OnInit,OnDestroy   {
   golink()
   {
     this.sharedValueService.onSharedDataChanged("pageupd","before");
-
+    $(".navbar-collapse").collapse('hide');
     return true;
   }
 //  todos=[

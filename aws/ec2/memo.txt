@@ -1,0 +1,388 @@
+
+aa
+//パラメータ例
+// { "ec2Ids" :["111","222"] , "rdsId":"id-xxxx" , "mode":"startId",  "tagName":"" }
+// { "ec2Ids" :[] , "rdsId":"" , "mode":"startTag",  "tagValue":"aaaa*" }
+
+
+/*
+ * Lambda関数登録ハンドラ
+ *
+ * @param event
+ * @param context
+ */
+exports.handler = function(event, context) {
+
+var AWS = require('aws-sdk'); 
+AWS.config.region = '*****';
+funcMain();
+
+/*
+ * 処理メイン
+ *
+ */
+    function funcMain(){
+    	var targetIds = event.ec2Ids;
+    	var targetRdsId = event.rdsId;
+	var targetTagValue = event.tagValue;
+
+    	console.log(event.mode + 'proc start');
+
+    	//モードにしたがってインスタンスの開始か終了を実行する
+    	switch(event.mode)
+    	{
+        		case 'startId':
+            		startEc2(targetIds);
+            		startRds(targetRdsId);
+            		context.done(null, 'Started Instance');
+            		break;
+
+       	 	case 'stopId':
+            		stopEc2(targetIds);
+            		stopRds(targetRdsId);
+            		context.done(null, 'Stoped Instance');
+           	 		break;
+        		case 'startTag':
+            		startEc2WithTag(targetTagValue );
+            		startRdsWithTag(targetTagValue );
+            		context.done(null, 'Started Instance');
+            		break;
+
+       	 	case 'stopTag':
+            		stopEc2WithTag(targetTagValue );
+            		stopRdsWithTag(targetTagValue );
+            		context.done(null, 'Stoped Instance');
+           	 		break;
+    	}
+
+	/*
+	 * 共通ログ
+	 *
+	 * @param err エラーオブジェクト
+	 * @param data 汎用データ
+	 * @return 成功したかどうか
+	 */
+	function commonSuccessLog(err, data)
+	{
+		if (err) {
+            		console.error(err, err.stack);
+            		context.done('error', err.stack);
+			return false;
+        		} else {
+            		console.log(data);
+			return true;
+        		}
+	}
+
+/*
+ * 対象IDのEC2開始
+ *
+ * @param ids 対象インスタンスID
+ */
+function startEc2(ids){
+    
+    if(ids.lenght == 0){
+    	console.log('skip ec2 start');
+        return;
+    }
+ 
+    ec2.startInstances({InstanceIds: ids}, function(err, data) {
+	commonSuccessLog(err, data);
+    });
+}
+
+/*
+ * 対象タグのEC2開始
+ *
+ * @param tagValue タグ値
+ */
+function startEc2WithTag(tagValue){
+	var ids = getEc2InstancesWithTag(tagValue);
+	startEc2(ids);
+}
+
+/*
+ * 対象IDのEC2インスタンス停止
+ *
+ * @param ids 対象インスタンスID
+ */
+function stopEc2(ids){
+
+    if(ids.lenght == 0){
+    	console.log('skip ec2 stop');
+        return;
+    }
+
+    var ec2 = new AWS.EC2();
+ 
+    ec2.stopInstances({InstanceIds: ids}, function(err, data) {
+	commonSuccessLog(err, data);
+    });
+}
+
+/*
+ * 対象タグのEC2終了
+ *
+ * @param tagValue タグ値
+ */
+function stopEc2WithTag(tagValue){
+	var ids = getEc2InstancesWithTag(tagValue);
+	stopEc2(ids);
+}
+
+/*
+ * 対象タグのEC2インスタンスID取得
+ *
+ * @param tagValue タグ値
+ * @return インスタンスID配列
+ */
+function getEc2InstancesWithTag(tagValue){
+
+    var ec2 = new AWS.EC2();
+
+    ec2.describeInstances({
+        Filters: [{
+            Name: 'tag-value',
+            Values: [tagValue]
+        }]
+    }, function(err, data) {
+        if (commonSuccessLog(err, data) === false) {
+            return;
+        }
+
+/*
+        const DEFAULT_BOOT_AT_UTC = '1'; //VST8
+        var current                      = new Date();
+        var current_hour                 = current.getHours();
+
+        var is_target = function(tags) {
+            for (var n in tags) {
+                if (tags[n].Key == 'BootAtUTC') {
+                    if (tags[n].Value == current_hour) {
+                        return true;
+                    }
+                    return false;
+                }
+                if (DEFAULT_BOOT_AT_UTC == current_hour){
+                    return true;
+                }
+            }
+            return false;
+        };*/
+
+        var get_target = function(ids, instances) {
+            for (var i = 0; i < instances.length; i++) {
+                var ins = instances[i];
+                /*if (is_target(ins.Tags)) {
+                    console.log("starting (instanceId: " + ins.InstanceId + ")");
+                    ids.push(ins.InstanceId);
+                }*/
+	ids.push(ins.InstanceId);
+            }
+        };
+        var ids = [];
+        for (var i = 0; i < data.Reservations.length; i++) {
+            get_target(ids, data.Reservations[i].Instances);
+        }
+	/*
+        ec2.startInstances({InstanceIds: ids}, function(err, data) {
+            if (err) {
+                console.log(err, err.stack);
+                context.done('error', err.stack);
+                return;
+            }
+            console.log(data);
+            context.done(null, '');
+        });*/
+	return ids;
+    });
+}
+
+
+/*
+ * 対象IDのRDS開始
+ *
+ * @param id 対象インスタンスID
+ */
+function startRds(id){
+
+    if(id == ''){
+    	console.log('skip rds start');
+        return;
+    }
+
+    var rds = new AWS.RDS();
+    
+    rds.startDBInstance({InstanceId: id}, function(err, data) {
+	commonSuccessLog(err, data);
+    });
+}
+
+/*
+ * 対象タグのRDS開始
+ *
+ * @param tagValue タグ値
+ */
+function startRdsWithTag(tagValue){
+	var ids = getRdsInstancesWithTag(tagValue);
+    	var rds = new AWS.RDS();
+        	for (var i = 0; i < ids.length; i++) {
+		rds.startDBInstance({InstanceId: ids[i]}, function(err, data) {
+			commonSuccessLog(err, data);
+    		});
+	}
+}
+
+/*
+ * RDS停止
+ *
+ * @param id 対象インスタンスID
+ */
+function stopRds(id){
+
+    if(id == ''){
+    	console.log('skip rds stop');
+        return;
+    }
+
+    var rds = new AWS.RDS();
+    
+    rds.stopDBInstance({InstanceId: id}, function(err, data) {
+	commonSuccessLog(err, data);
+    });
+}
+/*
+ * 対象タグのRDS終了
+ *
+ * @param tagValue タグ値
+ */
+function stopRdsWithTag(tagValue){
+	var ids = getRdsInstancesWithTag(tagValue);
+    	var rds = new AWS.RDS();
+        	for (var i = 0; i < ids.length; i++) {
+		rds.stopDBInstance({InstanceId: ids[i]}, function(err, data) {
+			commonSuccessLog(err, data);
+    		});
+	}
+}
+
+/*
+ * 対象タグのRDSインスタンス取得
+ *
+ * @param tagValue タグ値
+ * @return インスタンスID
+ */
+function getRdsInstancesWithTag(tagValue){
+
+    var rds = new AWS.RDS();
+
+    rds.describeDBInstances({
+        Filters: [{
+            Name: 'tag-value',
+            Values: [tagValue]
+        }]
+    }, function(err, data) {
+        if (err) {
+            console.log(err, err.stack);
+            context.done('error', err.stack);
+            return;
+        }
+
+        var get_target = function(ids, instances) {
+            for (var i = 0; i < instances.length; i++) {
+                var ins = instances[i];
+		ids.push(ins.InstanceId);
+            }
+        };
+        var ids = [];
+        for (var i = 0; i < data.Reservations.length; i++) {
+            get_target(ids, data.Reservations[i].Instances);
+        }
+	return ids;
+    });
+}
+
+};
+
+
+///開発時
+start smp-dev-main
+stop smp-dev*
+
+start smp-ops
+stop smp-*
+
+bastion smp-dev-main
+nat smp-dev-main
+win smp-dev-sub
+web1 smp-ops
+web2 smp-ops
+
+
+///IAMロール
+{
+    "Version": "2018-9-1",
+    "Statement": [
+        {
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Effect": "Allow",
+            "Resource": "arn:aws:logs:*:*:*"
+        },
+        {
+            "Action": [
+	    "rds:DescribeDBInstances",
+                "rds:StartDBInstance",
+                "rds:StopDBInstance",
+                "ec2:DescribeInstances",
+                "ec2:StartInstances",
+                "ec2:StopInstances"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        }
+    ]
+}
+
+///Auto Scariling
+//JST 9時-21時　まで2台
+//JST 21時-9時　まで0台
+$ aws autoscaling put-scheduled-update-group-action \
+    --auto-scaling-group-name "「AutoScalingGroup名」" \
+    --scheduled-action-name "up" \
+    --recurrence "0 0 * * *" \
+    --desired-capacity 2
+$ aws autoscaling put-scheduled-update-group-action \
+    --auto-scaling-group-name "「AutoScalingGroup名」" \
+    --scheduled-action-name "down" \
+    --recurrence "0 12 * * *" \
+    --desired-capacity 0
+
+//一覧
+$ aws autoscaling describe-scheduled-actions
+
+//削除
+$ aws autoscaling delete-scheduled-action \
+    --auto-scaling-group-name "「AutoScalingGroup名」" \
+    --scheduled-action-name "up"
+$ aws autoscaling delete-scheduled-action \
+    --auto-scaling-group-name "「AutoScalingGroup名」" \
+    --scheduled-action-name "down"
+
+//application.propetiesの環境切り替え
+application-dev1.properties
+export SPRING_PROFILES_ACTIVE=aws
+
+//////////////////////////
+rm -rf ROOT.war
+rm -rf ROOT
+
+mv /home/ec2-user/ROOT.war
+mv /home/ec2-user/dist/* ROOT/
+
+
+
+ 

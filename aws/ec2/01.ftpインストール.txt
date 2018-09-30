@@ -1,0 +1,44 @@
+--参考
+https://qiita.com/Yuki_BB3/items/deeb84c360c6f3c37f51
+
+---FTPの導入---
+
+sudo su
+yum install vsftpd -y
+
+
+sudo su
+cp /etc/vsftpd/vsftpd.conf /etc/vsftpd/vsftpd.conf.org
+Elastic_IP=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
+
+cat << EOF >> /etc/vsftpd/vsftpd.conf
+pasv_enable=YES
+pasv_addr_resolve=YES
+pasv_address=${Elastic_IP}
+pasv_min_port=60001
+pasv_max_port=60010
+use_localtime=YES
+force_dot_files=YES
+EOF
+
+sed -i -e "/^anonymous_enable/s/YES/NO/g" /etc/vsftpd/vsftpd.conf
+sed -i -e "/^dirmessage_enable/s/YES/NO/g" /etc/vsftpd/vsftpd.conf
+sed -i -e "/^#ascii_upload_enable/s/#//g" /etc/vsftpd/vsftpd.conf
+sed -i -e "/^#ascii_download_enable/s/#//g" /etc/vsftpd/vsftpd.conf
+sed -i -e "/^#chroot_local_user/s/#//g" /etc/vsftpd/vsftpd.conf
+sed -i -e "/^#chroot_list_enable/s/#//g" /etc/vsftpd/vsftpd.conf
+sed -i -e "/^tcp_wrappers/s/YES/NO/g" /etc/vsftpd/vsftpd.conf
+sed -i -e "/^connect_from_port_20/s/YES/NO/g" /etc/vsftpd/vsftpd.conf
+sed -i -e "/^xferlog_std_format/s/YES/NO/g" /etc/vsftpd/vsftpd.conf
+touch /etc/vsftpd/chroot_list
+
+-----起動
+sudo service vsftpd start
+sudo chkconfig vsftpd on
+
+
+-----FTPユーザーの作成
+useradd ftp-user
+passwd ftp-user
+
+

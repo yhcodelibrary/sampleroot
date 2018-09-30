@@ -1,6 +1,8 @@
 package sample.web.common.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.session.data.redis.config.ConfigureRedisAction;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 @Configuration
@@ -15,9 +17,9 @@ public class RedisHttpSessionConfig {
 //	    return redisConnectionFactory;
 //	  }
 //
-//  //※ElastiCacheではconfigureRedisAction()が必要らしいので追加
-//  @Bean
-//  public static ConfigureRedisAction configureRedisAction() {
-//      return ConfigureRedisAction.NO_OP;
-//  }
+  //※ElastiCacheではconfigureRedisAction()が必要らしいので追加
+  @Bean
+  public static ConfigureRedisAction configureRedisAction() {
+      return ConfigureRedisAction.NO_OP;
+  }
 }

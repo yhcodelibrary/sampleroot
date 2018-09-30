@@ -1,0 +1,11 @@
+
+------------------内部ファイルのアップデート
+sudo yum update
+
+
+------------------mysqlクライアントのインストール
+sudo yum install mysql
+
+
+----------------接続
+mysql -h testDB.hoge12345.ap-northeast-1.rds.amazonaws.com -P 3306 -u yourName -p

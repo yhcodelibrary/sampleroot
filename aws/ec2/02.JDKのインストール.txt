@@ -1,0 +1,13 @@
+-----参考
+https://weblabo.oscasierra.net/java-install-oracle-jdk8-centos7/
+
+
+rpm -ihv jdk-8u181-linux-x64.rpm
+java -version
+
+or
+
+yum install java-1.8.0-openjdk
+
+※インストール先
+/usr/java/jdk1.8.0_XXX
